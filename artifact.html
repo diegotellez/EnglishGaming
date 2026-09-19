@@ -1,0 +1,83 @@
+<title>GrammarQuest</title>
+<meta name="color-scheme" content="dark">
+<link rel="stylesheet" href="style.css">
+<div id="app">
+  <canvas id="fx-canvas"></canvas>
+
+  <header id="hud" class="hud" hidden>
+    <div class="hud-avatar" id="hud-avatar">🧙‍♀️</div>
+    <div class="hud-mid">
+      <div class="hud-name"><span id="hud-name">Hero</span><span class="hud-level" id="hud-level">Lv 1</span></div>
+      <div class="xpbar-track"><div class="xpbar-fill" id="hud-xpfill" style="width:0%"></div></div>
+    </div>
+    <div class="hud-coins">🪙 <span id="hud-coins">0</span></div>
+    <button class="hud-btn" id="hud-map-btn" title="Map" aria-label="Go to map">🗺️</button>
+    <button class="hud-btn" id="hud-mute" title="Mute" aria-label="Toggle sound">🔊</button>
+  </header>
+
+  <main>
+    <!-- WELCOME -->
+    <section id="screen-welcome" class="screen">
+      <div class="hero-badge">🗺️✨</div>
+      <h1 class="title-xl">GrammarQuest</h1>
+      <p class="subtitle">Journey through the Realms of English! Master tenses, passive voice, adjectives and verbs to defeat the Grammar Dragon. 🐉<br><span style="opacity:.8;">Aventúrate por los reinos del inglés — ¡domina la gramática y derrota al dragón!</span></p>
+      <div class="card" style="display:flex; flex-direction:column; gap:16px;">
+        <div>
+          <span class="field-label">Choose your hero</span>
+          <div class="avatar-grid" id="avatar-grid"></div>
+        </div>
+        <div>
+          <span class="field-label">Your name</span>
+          <input class="text-input" id="name-input" maxlength="18" placeholder="Type your hero name...">
+        </div>
+        <button class="btn btn-primary btn-block" id="start-btn">Begin the Quest ⚔️</button>
+      </div>
+      <p class="footer-note">6 realms · irregular verb caves · a final dragon battle</p>
+    </section>
+
+    <!-- MAP -->
+    <section id="screen-map" class="screen" hidden>
+      <div class="eyebrow" style="text-align:center;">The Realms</div>
+      <h2 class="title-xl" style="font-size:24px; text-align:center;">Choose a realm to explore</h2>
+      <div class="map-path" id="map-path"></div>
+      <div id="boss-node" class="boss-node"></div>
+    </section>
+
+    <!-- QUIZ -->
+    <section id="screen-quiz" class="screen" hidden>
+      <div id="quiz-dragon" class="dragon-wrap" hidden>
+        <div class="dragon-emoji" id="dragon-emoji">🐉</div>
+        <div class="hpbar-track"><div class="hpbar-fill" id="dragon-hpfill" style="width:100%"></div></div>
+        <div class="hp-label" id="dragon-hplabel">Dragon HP: 100%</div>
+      </div>
+      <div class="quiz-top">
+        <div class="timer-wrap">
+          <svg width="52" height="52" viewBox="0 0 52 52">
+            <circle cx="26" cy="26" r="20" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="5"></circle>
+            <circle id="timer-ring-fg" cx="26" cy="26" r="20" fill="none" stroke="var(--teal)" stroke-width="5" stroke-linecap="round"></circle>
+          </svg>
+          <div class="timer-num" id="timer-num">20</div>
+        </div>
+        <div class="progress-dots" id="quiz-dots"></div>
+        <div class="hearts" id="quiz-hearts-wrap"><span id="quiz-hearts"></span></div>
+      </div>
+      <span class="combo-chip" id="combo-chip" hidden>🔥 Combo</span>
+      <div class="card question-card">
+        <div class="question-topic" id="quiz-topic">Realm</div>
+        <div class="question-text" id="quiz-question">Question text</div>
+      </div>
+      <div class="options-grid" id="quiz-options"></div>
+    </section>
+
+    <!-- MEMORY -->
+    <section id="screen-memory" class="screen" hidden>
+      <div class="eyebrow" style="text-align:center;">Irregular Caves</div>
+      <h2 class="title-xl" style="font-size:22px; text-align:center;">Match each verb to its past form</h2>
+      <div class="memory-hud"><span id="mem-moves">Moves: 0</span><span id="mem-pairs">Pairs: 0 / 8</span></div>
+      <div class="memory-grid" id="memory-grid"></div>
+    </section>
+  </main>
+
+  <p class="footer-note">Made for 8th-grade English learners · GrammarQuest</p>
+</div>
+<script src="game.js"></script>
