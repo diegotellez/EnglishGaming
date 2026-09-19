@@ -7,38 +7,37 @@
   <header id="hud" class="hud" hidden>
     <div class="hud-avatar" id="hud-avatar">🧙‍♀️</div>
     <div class="hud-mid">
-      <div class="hud-name"><span id="hud-name">Hero</span><span class="hud-level" id="hud-level">Lv 1</span></div>
+      <div class="hud-name"><span id="hud-name">Héroe</span><span class="hud-level" id="hud-level">Nv 1</span><span id="hud-gear" class="hud-gear"></span></div>
       <div class="xpbar-track"><div class="xpbar-fill" id="hud-xpfill" style="width:0%"></div></div>
     </div>
     <div class="hud-coins">🪙 <span id="hud-coins">0</span></div>
-    <button class="hud-btn" id="hud-map-btn" title="Map" aria-label="Go to map">🗺️</button>
-    <button class="hud-btn" id="hud-mute" title="Mute" aria-label="Toggle sound">🔊</button>
+    <button class="hud-btn" id="hud-mute" title="Silenciar" aria-label="Activar o silenciar sonido">🔊</button>
   </header>
 
   <main>
-    <!-- WELCOME -->
+    <!-- BIENVENIDA -->
     <section id="screen-welcome" class="screen">
       <div class="hero-badge">🗺️✨</div>
       <h1 class="title-xl">GrammarQuest</h1>
-      <p class="subtitle">Journey through the Realms of English! Master tenses, passive voice, adjectives and verbs to defeat the Grammar Dragon. 🐉<br><span style="opacity:.8;">Aventúrate por los reinos del inglés — ¡domina la gramática y derrota al dragón!</span></p>
+      <p class="subtitle">¡Recorre los Reinos del Inglés! Domina los tiempos verbales, la voz pasiva, los adjetivos y los verbos para derrotar al Dragón Gramatical. 🐉<br><span style="opacity:.8;">Juega solo o conéctate con tu equipo en el modo Online.</span></p>
       <div class="card" style="display:flex; flex-direction:column; gap:16px;">
         <div>
-          <span class="field-label">Choose your hero</span>
+          <span class="field-label">Elige tu personaje</span>
           <div class="avatar-grid" id="avatar-grid"></div>
         </div>
         <div>
-          <span class="field-label">Your name</span>
-          <input class="text-input" id="name-input" maxlength="18" placeholder="Type your hero name...">
+          <span class="field-label">Tu nombre</span>
+          <input class="text-input" id="name-input" maxlength="18" placeholder="Escribe el nombre de tu héroe...">
         </div>
-        <button class="btn btn-primary btn-block" id="start-btn">Begin the Quest ⚔️</button>
+        <button class="btn btn-primary btn-block" id="start-btn">¡Comenzar la aventura! ⚔️</button>
       </div>
-      <p class="footer-note">6 realms · irregular verb caves · a final dragon battle</p>
+      <p class="footer-note">6 reinos · cuevas de verbos irregulares · batalla final · modo Online · tienda</p>
     </section>
 
-    <!-- MAP -->
+    <!-- TEMAS (mapa de reinos) -->
     <section id="screen-map" class="screen" hidden>
-      <div class="eyebrow" style="text-align:center;">The Realms</div>
-      <h2 class="title-xl" style="font-size:24px; text-align:center;">Choose a realm to explore</h2>
+      <div class="eyebrow" style="text-align:center;">Temas</div>
+      <h2 class="title-xl" style="font-size:24px; text-align:center;">Elige un reino para explorar</h2>
       <div class="map-path" id="map-path"></div>
       <div id="boss-node" class="boss-node"></div>
     </section>
@@ -48,7 +47,11 @@
       <div id="quiz-dragon" class="dragon-wrap" hidden>
         <div class="dragon-emoji" id="dragon-emoji">🐉</div>
         <div class="hpbar-track"><div class="hpbar-fill" id="dragon-hpfill" style="width:100%"></div></div>
-        <div class="hp-label" id="dragon-hplabel">Dragon HP: 100%</div>
+        <div class="hp-label" id="dragon-hplabel">Vida del dragón: 100%</div>
+      </div>
+      <div id="quiz-teambar-wrap" class="teambar-wrap" hidden>
+        <div class="teambar-track"><div class="teambar-fill" id="quiz-teambar-fill" style="width:0%"></div></div>
+        <div class="hp-label" id="quiz-teambar-label">Equipo: 0 / 0 respuestas correctas</div>
       </div>
       <div class="quiz-top">
         <div class="timer-wrap">
@@ -61,23 +64,83 @@
         <div class="progress-dots" id="quiz-dots"></div>
         <div class="hearts" id="quiz-hearts-wrap"><span id="quiz-hearts"></span></div>
       </div>
-      <span class="combo-chip" id="combo-chip" hidden>🔥 Combo</span>
+      <span class="combo-chip" id="combo-chip" hidden>🔥 Racha</span>
       <div class="card question-card">
-        <div class="question-topic" id="quiz-topic">Realm</div>
-        <div class="question-text" id="quiz-question">Question text</div>
+        <div class="question-topic" id="quiz-topic">Reino</div>
+        <div class="question-text" id="quiz-question">Pregunta</div>
       </div>
       <div class="options-grid" id="quiz-options"></div>
     </section>
 
-    <!-- MEMORY -->
+    <!-- MEMORIA -->
     <section id="screen-memory" class="screen" hidden>
-      <div class="eyebrow" style="text-align:center;">Irregular Caves</div>
-      <h2 class="title-xl" style="font-size:22px; text-align:center;">Match each verb to its past form</h2>
-      <div class="memory-hud"><span id="mem-moves">Moves: 0</span><span id="mem-pairs">Pairs: 0 / 8</span></div>
+      <div class="eyebrow" style="text-align:center;">Cuevas Irregulares</div>
+      <h2 class="title-xl" style="font-size:22px; text-align:center;">Une cada verbo con su forma pasada</h2>
+      <div class="memory-hud"><span id="mem-moves">Movimientos: 0</span><span id="mem-pairs">Parejas: 0 / 8</span></div>
       <div class="memory-grid" id="memory-grid"></div>
+    </section>
+
+    <!-- TIENDA -->
+    <section id="screen-shop" class="screen" hidden>
+      <div class="eyebrow" style="text-align:center;">Tienda</div>
+      <h2 class="title-xl" style="font-size:22px; text-align:center;">Personaliza a tu héroe</h2>
+      <p class="subtitle">Usa las monedas que ganas jugando para desbloquear personajes, sombreros, vehículos y comida. Lo que equipes se verá también en el modo Online.</p>
+      <div class="shop-coins-row">🪙 <strong id="shop-coins">0</strong> monedas</div>
+      <div class="shop-tabs" id="shop-tabs"></div>
+      <div class="shop-grid" id="shop-grid"></div>
+    </section>
+
+    <!-- ONLINE -->
+    <section id="screen-online" class="screen" hidden>
+      <div class="eyebrow" style="text-align:center;">Online</div>
+      <h2 class="title-xl" style="font-size:22px; text-align:center;">Juega en equipo</h2>
+
+      <div id="online-home">
+        <div class="card" style="display:flex; flex-direction:column; gap:12px;">
+          <p class="subtitle" style="text-align:left;">Crea un equipo o únete con el código que te dé tu profesor o un compañero.</p>
+          <div>
+            <span class="field-label">Código de equipo</span>
+            <input class="text-input code-input" id="online-code-input" maxlength="8" placeholder="Ej: LOBO42">
+          </div>
+          <button class="btn btn-primary btn-block" id="online-join-btn">Unirme con este código</button>
+          <button class="btn btn-ghost btn-block" id="online-create-btn">Crear equipo nuevo</button>
+        </div>
+        <p class="footer-note">Necesita conexión a internet. Funciona mejor con equipos de hasta 4 jugadores. Si la red del colegio bloquea conexiones directas, puede fallar — en ese caso, jueguen en modo individual.</p>
+      </div>
+
+      <div id="online-lobby" hidden>
+        <div class="card" style="text-align:center;">
+          <div class="eyebrow">Código de tu equipo</div>
+          <div class="online-code-big" id="online-code-display">-----</div>
+          <p class="footer-note">Compártelo con tus compañeros para que se unan</p>
+        </div>
+        <div class="card">
+          <div class="eyebrow">Tu equipo</div>
+          <div id="online-roster"></div>
+        </div>
+        <div id="online-topic-picker" class="card"></div>
+        <button class="btn btn-gold btn-block" id="online-start-btn" hidden>Comenzar reto de equipo</button>
+        <button class="btn btn-ghost btn-block" id="online-leave-btn">Salir del equipo</button>
+      </div>
+
+      <div id="online-waiting" hidden>
+        <div class="card" style="text-align:center;">
+          <div style="font-size:36px;">⏳</div>
+          <h3>Esperando a tu equipo...</h3>
+          <p class="subtitle">Ya respondiste tus preguntas. En cuanto todos terminen verán el resultado juntos.</p>
+        </div>
+        <button class="btn btn-ghost btn-block" id="online-waiting-leave">Salir del equipo</button>
+      </div>
     </section>
   </main>
 
-  <p class="footer-note">Made for 8th-grade English learners · GrammarQuest</p>
+  <nav id="tabbar" class="tabbar" hidden>
+    <button class="tab-btn active" data-tab="map"><span class="tab-ic">🗺️</span>Temas</button>
+    <button class="tab-btn" data-tab="online"><span class="tab-ic">🌐</span>Online</button>
+    <button class="tab-btn" data-tab="shop"><span class="tab-ic">🎒</span>Tienda</button>
+  </nav>
+
+  <p class="footer-note">Hecho para estudiantes de Octavo · GrammarQuest</p>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.2/dist/peerjs.min.js"></script>
 <script src="game.js"></script>

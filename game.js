@@ -1,20 +1,24 @@
 /* ============================================================
-   GrammarQuest — the Realms of English
-   Self-contained game engine + question banks. No build step.
+   GrammarQuest — los Reinos del Inglés
+   Motor del juego + banco de preguntas. Sin build, un solo archivo.
+   Las preguntas del quiz quedan en inglés (es lo que se enseña);
+   todo el menú y la navegación están en español.
    ============================================================ */
 (function(){
 "use strict";
 
-/* ---------------- content ---------------- */
+/* ---------------- contenido: reinos y preguntas ---------------- */
 
 const REALMS = [
-  {key:'present',    name:'Present Village',   icon:'🏘️', color:'#33E4C2', desc:'Present Simple & Continuous'},
-  {key:'past',        name:'Past Ruins',        icon:'🏛️', color:'#FFC857', desc:'Past Simple & Continuous'},
-  {key:'passive',     name:'Passive Fortress',  icon:'🏰', color:'#9B6BFF', desc:'Passive Voice'},
-  {key:'adjectives',  name:'Adjective Gardens', icon:'🌺', color:'#FF6B8B', desc:'Comparatives & Superlatives'},
-  {key:'regular',     name:'Regular Forge',     icon:'⚒️', color:'#7DB2FF', desc:'Regular Verbs (-ed)'},
-  {key:'irregular',   name:'Irregular Caves',   icon:'🔮', color:'#FF9E4A', desc:'Irregular Verbs — Memory'},
+  {key:'present',    name:'Aldea del Presente',  icon:'🏘️', color:'#33E4C2', desc:'Presente simple y continuo'},
+  {key:'past',        name:'Ruinas del Pasado',   icon:'🏛️', color:'#FFC857', desc:'Pasado simple y continuo'},
+  {key:'passive',     name:'Fortaleza Pasiva',    icon:'🏰', color:'#9B6BFF', desc:'Voz pasiva'},
+  {key:'adjectives',  name:'Jardín de Adjetivos', icon:'🌺', color:'#FF6B8B', desc:'Comparativos y superlativos'},
+  {key:'regular',     name:'Forja Regular',       icon:'⚒️', color:'#7DB2FF', desc:'Verbos regulares (-ed)'},
+  {key:'irregular',   name:'Cuevas Irregulares',  icon:'🔮', color:'#FF9E4A', desc:'Verbos irregulares — memoria'},
 ];
+
+function q(text, options, answerIndex){ return {text, options, a:answerIndex}; }
 
 const QUESTIONS = {
   present: [
@@ -135,20 +139,77 @@ const IRREGULAR_MCQ = [
   q("What is the past simple of 'run'?", ["runned","ran","run","running"], 1),
 ];
 
-function q(text, options, answerIndex){ return {text, options, a:answerIndex}; }
+/* ---------------- tienda: personajes, sombreros, vehículos, comida ---------------- */
 
-/* ---------------- state ---------------- */
+const SHOP = {
+  personajes: [
+    {id:'wizard', icon:'🧙‍♀️', name:'Hechicera', price:0},
+    {id:'hero', icon:'🦸', name:'Héroe', price:0},
+    {id:'ninja', icon:'🥷', name:'Ninja', price:0},
+    {id:'elf', icon:'🧝', name:'Elfo', price:0},
+    {id:'vampire', icon:'🧛', name:'Vampiro', price:0},
+    {id:'villain', icon:'🦹', name:'Villano', price:0},
+    {id:'fairy', icon:'🧚', name:'Hada', price:0},
+    {id:'dragonhero', icon:'🐲', name:'Jinete de Dragón', price:0},
+    {id:'unicorn', icon:'🦄', name:'Unicornio', price:150},
+    {id:'robot', icon:'🤖', name:'Robot', price:150},
+    {id:'genie', icon:'🧞', name:'Genio', price:200},
+    {id:'dino', icon:'🦖', name:'Dinosaurio', price:200},
+    {id:'zombie', icon:'🧟', name:'Zombi', price:180},
+    {id:'wolf', icon:'🐺', name:'Lobo', price:220},
+    {id:'alien', icon:'👽', name:'Alien', price:250},
+    {id:'king', icon:'🤴', name:'Rey', price:280},
+  ],
+  sombreros: [
+    {id:'cap', icon:'🧢', name:'Gorra', price:40},
+    {id:'sunglasses', icon:'🕶️', name:'Lentes de sol', price:45},
+    {id:'party', icon:'🎉', name:'Gorro de fiesta', price:50},
+    {id:'tophat', icon:'🎩', name:'Sombrero de copa', price:60},
+    {id:'helmet', icon:'⛑️', name:'Casco', price:70},
+    {id:'grad', icon:'🎓', name:'Birrete', price:90},
+    {id:'military', icon:'🪖', name:'Casco militar', price:100},
+    {id:'crown', icon:'👑', name:'Corona', price:250},
+  ],
+  vehiculos: [
+    {id:'truck', icon:'🚚', name:'Camión', price:100},
+    {id:'car', icon:'🚗', name:'Auto deportivo', price:120},
+    {id:'patrol', icon:'🚓', name:'Patrulla', price:130},
+    {id:'pickup', icon:'🛻', name:'Camioneta', price:140},
+    {id:'racecar', icon:'🏎️', name:'Auto de carreras', price:220},
+    {id:'tank', icon:'🛡️', name:'Tanque', price:200},
+    {id:'heli', icon:'🚁', name:'Helicóptero', price:240},
+    {id:'rocket', icon:'🚀', name:'Cohete', price:260},
+  ],
+  comida: [
+    {id:'apple', icon:'🍎', name:'Manzana', price:15},
+    {id:'cookie', icon:'🍪', name:'Galleta', price:15},
+    {id:'fries', icon:'🍟', name:'Papas fritas', price:20},
+    {id:'donut', icon:'🍩', name:'Dona', price:20},
+    {id:'taco', icon:'🌮', name:'Taco', price:25},
+    {id:'icecream', icon:'🍦', name:'Helado', price:25},
+    {id:'pizza', icon:'🍕', name:'Pizza', price:30},
+    {id:'burger', icon:'🍔', name:'Hamburguesa', price:30},
+  ],
+};
+const SHOP_TABS = [
+  {key:'personajes', label:'Personajes', icon:'🧙'},
+  {key:'sombreros', label:'Sombreros', icon:'🎩'},
+  {key:'vehiculos', label:'Vehículos', icon:'🚗'},
+  {key:'comida', label:'Comida', icon:'🍕'},
+];
 
-const SAVE_KEY = 'grammarquest_save_v1';
-const AVATARS = ['🧙‍♀️','🦸','🥷','🧝','🧛','🦹','🧚','🐉'];
+/* ---------------- estado / guardado ---------------- */
 
-let state = loadState();
+const SAVE_KEY = 'grammarquest_save_v2';
+const AVATARS = SHOP.personajes.filter(p=>p.price===0).map(p=>p.icon);
 
 function defaultState(){
   return {
     name:'', avatar:AVATARS[0], level:1, xp:0, coins:0,
     stars:{present:0,past:0,passive:0,adjectives:0,regular:0,irregular:0},
     bossCleared:false, muted:false, started:false,
+    inventory:{personajes:[], sombreros:[], vehiculos:[], comida:[]},
+    equipped:{personaje:null, sombreros:null, vehiculos:null, comida:null},
   };
 }
 
@@ -157,14 +218,33 @@ function loadState(){
     const raw = localStorage.getItem(SAVE_KEY);
     if(!raw) return defaultState();
     const parsed = JSON.parse(raw);
-    return Object.assign(defaultState(), parsed);
+    const merged = Object.assign(defaultState(), parsed);
+    merged.inventory = Object.assign(defaultState().inventory, parsed.inventory||{});
+    merged.equipped = Object.assign(defaultState().equipped, parsed.equipped||{});
+    merged.stars = Object.assign(defaultState().stars, parsed.stars||{});
+    return merged;
   }catch(e){ return defaultState(); }
 }
 function saveState(){
-  try{ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }catch(e){ /* private mode etc */ }
+  try{ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }catch(e){ /* modo privado, etc */ }
+}
+let state = loadState();
+
+function isOwned(cat, item){ return item.price===0 || state.inventory[cat].includes(item.id); }
+function equippedItem(cat){
+  const id = state.equipped[cat];
+  if(!id) return null;
+  return SHOP[cat].find(i=>i.id===id) || null;
+}
+function gearIcons(){
+  return [equippedItem('sombreros'), equippedItem('vehiculos'), equippedItem('comida')]
+    .filter(Boolean).map(i=>i.icon).join(' ');
+}
+function myProfile(){
+  return { name: state.name || 'Héroe', avatar: state.avatar, gear: gearIcons() };
 }
 
-/* ---------------- audio (synth, no files) ---------------- */
+/* ---------------- audio (sintetizado, sin archivos) ---------------- */
 
 let actx = null;
 function tone(freq, dur, type, gain){
@@ -190,9 +270,10 @@ const sfx = {
   click(){ tone(520,.05,'square',.03); },
   win(){ [660,880,1100,1320].forEach((f,i)=>setTimeout(()=>tone(f,.18,'triangle',.06), i*90)); },
   hurt(){ tone(140,.3,'sawtooth',.07); },
+  buy(){ tone(700,.08,'square',.05); setTimeout(()=>tone(1000,.1,'square',.05),70); },
 };
 
-/* ---------------- fx: confetti ---------------- */
+/* ---------------- fx: confeti ---------------- */
 
 const canvas = document.getElementById('fx-canvas');
 const ctx = canvas.getContext('2d');
@@ -233,10 +314,10 @@ function toast(msg){
   const el = document.createElement('div');
   el.className = 'toast'; el.textContent = msg;
   document.body.appendChild(el);
-  setTimeout(()=>el.remove(), 1800);
+  setTimeout(()=>el.remove(), 2000);
 }
 
-/* ---------------- xp / rewards ---------------- */
+/* ---------------- xp / recompensas ---------------- */
 function xpForLevel(lvl){ return lvl*120; }
 function grantXp(amount){
   state.xp += amount;
@@ -245,19 +326,22 @@ function grantXp(amount){
     state.xp -= xpForLevel(state.level);
     state.level += 1; leveled = true;
   }
-  if(leveled){ toast('⭐ Level up! Now level '+state.level); sfx.win(); burstCenter(); }
+  if(leveled){ toast('⭐ ¡Subiste de nivel! Ahora eres nivel '+state.level); sfx.win(); burstCenter(); }
   saveState(); renderHud();
 }
 function grantCoins(n){ state.coins += n; saveState(); renderHud(); }
 
-/* ---------------- DOM refs ---------------- */
+/* ---------------- referencias DOM ---------------- */
 const $ = sel => document.querySelector(sel);
 const hud = $('#hud');
+const tabbar = $('#tabbar');
 const screens = {
   welcome: $('#screen-welcome'),
   map: $('#screen-map'),
   quiz: $('#screen-quiz'),
   memory: $('#screen-memory'),
+  shop: $('#screen-shop'),
+  online: $('#screen-online'),
 };
 let overlay = null;
 
@@ -265,21 +349,24 @@ function showScreen(name){
   Object.values(screens).forEach(s=>s.hidden = true);
   screens[name].hidden = false;
   window.scrollTo({top:0, behavior: reduceMotion ? 'auto' : 'smooth'});
+  [...tabbar.children].forEach(b=>b.classList.toggle('active', b.dataset.tab===name));
 }
 
 function renderHud(){
-  if(!state.started){ hud.hidden = true; return; }
+  if(!state.started){ hud.hidden = true; tabbar.hidden = true; return; }
   hud.hidden = false;
+  tabbar.hidden = false;
   $('#hud-avatar').textContent = state.avatar;
-  $('#hud-name').textContent = state.name || 'Hero';
-  $('#hud-level').textContent = 'Lv '+state.level;
+  $('#hud-name').textContent = state.name || 'Héroe';
+  $('#hud-level').textContent = 'Nv '+state.level;
   const pct = Math.min(100, Math.round((state.xp / xpForLevel(state.level))*100));
   $('#hud-xpfill').style.width = pct+'%';
   $('#hud-coins').textContent = state.coins;
+  $('#hud-gear').textContent = gearIcons();
   $('#hud-mute').textContent = state.muted ? '🔇' : '🔊';
 }
 
-/* ---------------- welcome screen ---------------- */
+/* ---------------- pantalla de bienvenida ---------------- */
 function initWelcome(){
   const grid = $('#avatar-grid');
   grid.innerHTML = '';
@@ -287,7 +374,7 @@ function initWelcome(){
     const b = document.createElement('button');
     b.className = 'avatar-pick'+(av===state.avatar?' selected':'');
     b.textContent = av;
-    b.setAttribute('aria-label','Choose avatar '+av);
+    b.setAttribute('aria-label','Elegir personaje '+av);
     b.onclick = ()=>{ state.avatar = av; sfx.click();
       [...grid.children].forEach(c=>c.classList.remove('selected'));
       b.classList.add('selected');
@@ -297,7 +384,7 @@ function initWelcome(){
   const nameInput = $('#name-input');
   nameInput.value = state.name || '';
   $('#start-btn').onclick = ()=>{
-    state.name = (nameInput.value||'Hero').trim().slice(0,18) || 'Hero';
+    state.name = (nameInput.value||'Héroe').trim().slice(0,18) || 'Héroe';
     state.started = true;
     saveState(); sfx.click();
     renderHud();
@@ -306,7 +393,24 @@ function initWelcome(){
   };
 }
 
-/* ---------------- map screen ---------------- */
+/* ---------------- pestañas inferiores ---------------- */
+function initTabbar(){
+  tabbar.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.onclick = ()=>{
+      sfx.click();
+      cancelActiveQuiz();
+      const tab = btn.dataset.tab;
+      if(tab === 'map'){ renderMap(); showScreen('map'); }
+      else if(tab === 'shop'){ renderShop(); showScreen('shop'); }
+      else if(tab === 'online'){ renderOnline(); showScreen('online'); }
+    };
+  });
+}
+function cancelActiveQuiz(){
+  if(quizCtx && quizCtx.timer){ clearInterval(quizCtx.timer); }
+}
+
+/* ---------------- mapa de reinos ("Temas") ---------------- */
 function starsHtml(count){
   let h = '';
   for(let i=0;i<3;i++) h += `<span class="star ${i<count?'on':''}">★</span>`;
@@ -342,9 +446,9 @@ function renderMap(){
   const bossBox = $('#boss-node');
   bossBox.className = 'boss-node'+(allCleared?' ready':'');
   bossBox.innerHTML = allCleared
-    ? `<div style="font-size:40px;">🐉</div><h3>The Grammar Dragon</h3><p class="footer-note" style="font-size:12.5px;">Face the final mixed challenge!</p>
-       <button class="btn btn-gold btn-block" id="boss-btn">${state.bossCleared? 'Battle again' : 'Start Boss Battle'}</button>`
-    : `<div style="font-size:36px; opacity:.5;">🐉</div><h3 style="color:var(--ink-dim);">The Grammar Dragon</h3><p class="footer-note">Earn a star in every realm to unlock the final battle.</p>`;
+    ? `<div style="font-size:40px;">🐉</div><h3>El Dragón Gramatical</h3><p class="footer-note" style="font-size:12.5px;">¡Enfréntate al reto final mixto!</p>
+       <button class="btn btn-gold btn-block" id="boss-btn">${state.bossCleared? 'Jugar otra vez' : 'Iniciar batalla final'}</button>`
+    : `<div style="font-size:36px; opacity:.5;">🐉</div><h3 style="color:var(--ink-dim);">El Dragón Gramatical</h3><p class="footer-note">Gana al menos una estrella en cada reino para desbloquear la batalla final.</p>`;
   if(allCleared){ $('#boss-btn').onclick = ()=>{ sfx.click(); startBoss(); }; }
 }
 
@@ -353,7 +457,7 @@ function openRealm(key){
   startQuiz(key);
 }
 
-/* ---------------- quiz engine ---------------- */
+/* ---------------- motor de preguntas ---------------- */
 let quizCtx = null;
 
 function sample(arr, n){
@@ -368,7 +472,7 @@ function startQuiz(realmKey){
   quizCtx = {
     realmKey, realmName: realm.name, color:realm.color, questions:pool,
     idx:0, correctCount:0, lives:3, combo:0, timer:null, timeLeft:20,
-    isBoss:false, xpEarned:0, coinsEarned:0,
+    isBoss:false, isOnline:false, xpEarned:0, coinsEarned:0,
   };
   renderQuizChrome();
   askQuestion();
@@ -380,27 +484,35 @@ function startBoss(){
   Object.keys(QUESTIONS).forEach(k=>{ mixed.push(...sample(QUESTIONS[k], 2).map(x=>({...x, topic:k}))); });
   mixed.push(...sample(IRREGULAR_MCQ, 3).map(x=>({...x, topic:'irregular'})));
   quizCtx = {
-    realmKey:'boss', realmName:'The Grammar Dragon', color:'#FF6B8B',
+    realmKey:'boss', realmName:'El Dragón Gramatical', color:'#FF6B8B',
     questions: sample(mixed, mixed.length),
     idx:0, correctCount:0, lives:3, combo:0, timer:null, timeLeft:20,
-    isBoss:true, hp:100, xpEarned:0, coinsEarned:0,
+    isBoss:true, isOnline:false, hp:100, xpEarned:0, coinsEarned:0,
   };
   renderQuizChrome();
   askQuestion();
   showScreen('quiz');
 }
 
+function buildTopicPool(topicKey, count){
+  if(topicKey === 'mixed'){
+    const mixed = [];
+    Object.keys(QUESTIONS).forEach(k=>{ mixed.push(...sample(QUESTIONS[k], 2).map(x=>({...x, topic:k}))); });
+    mixed.push(...sample(IRREGULAR_MCQ, 2).map(x=>({...x, topic:'irregular'})));
+    return sample(mixed, count);
+  }
+  return sample(QUESTIONS[topicKey], count);
+}
+
 function renderQuizChrome(){
   $('#quiz-dragon').hidden = !quizCtx.isBoss;
-  $('#quiz-hearts-wrap').hidden = false;
-  if(quizCtx.isBoss){
-    $('#dragon-emoji').textContent = '🐉';
-    updateDragonHp();
-  }
+  $('#quiz-teambar-wrap').hidden = !quizCtx.isOnline;
+  if(quizCtx.isBoss){ updateDragonHp(); }
+  if(quizCtx.isOnline){ renderTeamBar(); }
 }
 function updateDragonHp(){
   $('#dragon-hpfill').style.width = Math.max(0,quizCtx.hp)+'%';
-  $('#dragon-hplabel').textContent = 'Dragon HP: '+Math.max(0,quizCtx.hp)+'%';
+  $('#dragon-hplabel').textContent = 'Vida del dragón: '+Math.max(0,quizCtx.hp)+'%';
 }
 
 function renderHearts(){
@@ -432,7 +544,7 @@ function askQuestion(){
   $('#quiz-topic').textContent = quizCtx.isBoss ? (REALMS.find(r=>r.key===item.topic)?.name || item.topic) : quizCtx.realmName;
   $('#quiz-question').textContent = item.text;
   $('#combo-chip').hidden = quizCtx.combo < 2;
-  $('#combo-chip').textContent = '🔥 Combo x'+quizCtx.combo;
+  $('#combo-chip').textContent = '🔥 Racha x'+quizCtx.combo;
 
   const optWrap = $('#quiz-options');
   optWrap.innerHTML = '';
@@ -499,6 +611,7 @@ function answerQuestion(choice, item, btn, optWrap){
     }
   }
   renderHearts();
+  if(quizCtx.isOnline) reportOnlineProgress(false);
 
   setTimeout(()=>{
     quizCtx.idx += 1;
@@ -511,20 +624,28 @@ function finishQuiz(){
   const pct = total ? quizCtx.correctCount/total : 0;
   let stars = 0;
   if(pct >= 0.9) stars = 3; else if(pct >= 0.7) stars = 2; else if(pct >= 0.4) stars = 1;
-  const lostByHp = quizCtx.isBoss && quizCtx.hp <= 0;
+
+  if(quizCtx.isOnline){
+    reportOnlineProgress(true);
+    grantXp(quizCtx.xpEarned);
+    grantCoins(quizCtx.coinsEarned);
+    showOnlineWaiting();
+    return;
+  }
 
   grantXp(quizCtx.xpEarned);
   grantCoins(quizCtx.coinsEarned);
 
   if(quizCtx.isBoss){
-    showBossResult(lostByHp || quizCtx.correctCount/total >= 0.5, quizCtx);
+    const won = quizCtx.hp <= 0 || quizCtx.correctCount/total >= 0.5;
+    showBossResult(won, quizCtx);
   } else {
     if(stars > (state.stars[quizCtx.realmKey]||0)){
       state.stars[quizCtx.realmKey] = stars;
       saveState();
     }
     showResult({
-      title: stars>0 ? 'Realm cleared!' : 'Keep practicing!',
+      title: stars>0 ? '¡Reino superado!' : '¡Sigue practicando!',
       stars, correct: quizCtx.correctCount, total,
       xp: quizCtx.xpEarned, coins: quizCtx.coinsEarned,
       onContinue: ()=>{ renderMap(); showScreen('map'); },
@@ -537,11 +658,11 @@ function finishQuiz(){
 function showBossResult(won, ctx){
   if(won){ state.bossCleared = true; saveState(); sfx.win(); burstCenter(['#FF6B8B','#FFC857','#9B6BFF','#33E4C2']); }
   showResult({
-    title: won ? '🐉 Dragon defeated!' : 'The dragon escaped...',
+    title: won ? '🐉 ¡Dragón derrotado!' : 'El dragón escapó...',
     stars: won ? 3 : 1,
     correct: ctx.correctCount, total: ctx.questions.length,
     xp: ctx.xpEarned, coins: ctx.coinsEarned,
-    subtitle: won ? 'You are the Grammar Champion of the Realms!' : 'Review the realms and try again — you can do it!',
+    subtitle: won ? '¡Eres el campeón de la gramática de los Reinos!' : 'Repasa los reinos e inténtalo de nuevo — ¡tú puedes!',
     onContinue: ()=>{ renderMap(); showScreen('map'); },
     onRetry: ()=>{ closeOverlay(); startBoss(); },
   });
@@ -552,16 +673,15 @@ function showResult(opts){
   overlay.className = 'overlay';
   overlay.innerHTML = `
     <div class="card result-card">
-      <div class="eyebrow">${opts.subtitle? '' : 'Results'}</div>
       <h2 class="title-xl" style="font-size:22px;">${opts.title}</h2>
       ${opts.subtitle? `<p class="subtitle">${opts.subtitle}</p>` : ''}
       <div class="result-stars">${[0,1,2].map(i=>`<span class="star ${i<opts.stars?'on':''}">★</span>`).join('')}</div>
-      <div class="result-row"><span>Correct answers</span><strong>${opts.correct} / ${opts.total}</strong></div>
-      <div class="result-row"><span>XP earned</span><strong>+${opts.xp} ✨</strong></div>
-      <div class="result-row"><span>Coins earned</span><strong>+${opts.coins} 🪙</strong></div>
+      <div class="result-row"><span>Respuestas correctas</span><strong>${opts.correct} / ${opts.total}</strong></div>
+      <div class="result-row"><span>XP ganada</span><strong>+${opts.xp} ✨</strong></div>
+      <div class="result-row"><span>Monedas ganadas</span><strong>+${opts.coins} 🪙</strong></div>
       <div style="display:flex; gap:10px; margin-top:18px;">
-        <button class="btn btn-ghost btn-block" id="result-retry">Retry</button>
-        <button class="btn btn-primary btn-block" id="result-continue">Continue</button>
+        <button class="btn btn-ghost btn-block" id="result-retry">Reintentar</button>
+        <button class="btn btn-primary btn-block" id="result-continue">Continuar</button>
       </div>
     </div>`;
   document.body.appendChild(overlay);
@@ -570,7 +690,7 @@ function showResult(opts){
 }
 function closeOverlay(){ if(overlay){ overlay.remove(); overlay=null; } }
 
-/* ---------------- memory game (irregular verbs) ---------------- */
+/* ---------------- juego de memoria (verbos irregulares) ---------------- */
 let memCtx = null;
 
 function startMemory(){
@@ -602,8 +722,8 @@ function renderMemory(){
   updateMemoryHud();
 }
 function updateMemoryHud(){
-  $('#mem-moves').textContent = 'Moves: '+memCtx.moves;
-  $('#mem-pairs').textContent = 'Pairs: '+memCtx.matched+' / '+memCtx.total;
+  $('#mem-moves').textContent = 'Movimientos: '+memCtx.moves;
+  $('#mem-pairs').textContent = 'Parejas: '+memCtx.matched+' / '+memCtx.total;
 }
 
 function flipCard(card, el){
@@ -647,20 +767,392 @@ function finishMemory(){
   sfx.win(); burstCenter(['#FF9E4A','#FFC857','#33E4C2']);
   setTimeout(()=>{
     showResult({
-      title:'Irregular Caves cleared!', stars, correct:memCtx.total, total:memCtx.total,
+      title:'¡Cuevas Irregulares superadas!', stars, correct:memCtx.total, total:memCtx.total,
       xp, coins,
-      subtitle: 'Moves used: '+memCtx.moves,
+      subtitle: 'Movimientos usados: '+memCtx.moves,
       onContinue: ()=>{ renderMap(); showScreen('map'); },
       onRetry: ()=>{ closeOverlay(); startMemory(); },
     });
   }, 400);
 }
 
-/* ---------------- init ---------------- */
+/* ---------------- Tienda ---------------- */
+let shopTab = 'personajes';
+
+function renderShop(){
+  const tabsWrap = $('#shop-tabs');
+  tabsWrap.innerHTML = '';
+  SHOP_TABS.forEach(t=>{
+    const b = document.createElement('button');
+    b.className = 'shop-tab'+(t.key===shopTab?' active':'');
+    b.innerHTML = `${t.icon} ${t.label}`;
+    b.onclick = ()=>{ shopTab = t.key; sfx.click(); renderShop(); };
+    tabsWrap.appendChild(b);
+  });
+  $('#shop-coins').textContent = state.coins;
+
+  const grid = $('#shop-grid');
+  grid.innerHTML = '';
+  const items = SHOP[shopTab];
+  const equippedField = shopTab === 'personajes' ? null : shopTab;
+  items.forEach(item=>{
+    const owned = isOwned(shopTab, item);
+    const isEquipped = shopTab === 'personajes'
+      ? state.avatar === item.icon
+      : state.equipped[equippedField] === item.id;
+    const card = document.createElement('button');
+    card.className = 'shop-card'+(isEquipped?' equipped':'')+(!owned?' locked':'');
+    card.innerHTML = `
+      <div class="shop-icon">${item.icon}</div>
+      <div class="shop-name">${item.name}</div>
+      <div class="price-chip">${isEquipped? 'Puesto' : (owned? 'Tuyo' : (item.price===0? 'Gratis' : '🪙 '+item.price))}</div>
+    `;
+    card.onclick = ()=> handleShopClick(item, owned, isEquipped, equippedField);
+    grid.appendChild(card);
+  });
+}
+
+function handleShopClick(item, owned, isEquipped, equippedField){
+  if(shopTab === 'personajes'){
+    if(!owned){
+      if(state.coins < item.price){ sfx.wrong(); toast('Te faltan monedas — ¡sigue jugando para ganar más! 🪙'); return; }
+      state.coins -= item.price;
+      state.inventory.personajes.push(item.id);
+      sfx.buy();
+    } else { sfx.click(); }
+    state.avatar = item.icon;
+    saveState(); renderHud(); renderShop();
+    return;
+  }
+  if(isEquipped){
+    state.equipped[equippedField] = null;
+    sfx.click();
+  } else if(owned){
+    state.equipped[equippedField] = item.id;
+    sfx.click();
+  } else {
+    if(state.coins < item.price){ sfx.wrong(); toast('Te faltan monedas — ¡sigue jugando para ganar más! 🪙'); return; }
+    state.coins -= item.price;
+    state.inventory[equippedField].push(item.id);
+    state.equipped[equippedField] = item.id;
+    sfx.buy(); burstCenter(['#FFC857','#33E4C2']);
+  }
+  saveState(); renderHud(); renderShop();
+}
+
+/* ---------------- Online: código de equipo (PeerJS, sin backend propio) ---------------- */
+
+const PEER_PREFIX = 'grammarquest-';
+let online = null; // {peer, isHost, code, conns:Map, players:Map, myId, questions, topicLabel}
+
+function peerAvailable(){ return typeof window.Peer !== 'undefined'; }
+
+function renderOnline(){
+  if(online && online.myId){ renderOnlineLobby(); return; }
+  $('#online-home').hidden = false;
+  $('#online-lobby').hidden = true;
+  $('#online-waiting').hidden = true;
+}
+
+function initOnlineScreen(){
+  $('#online-create-btn').onclick = ()=>{
+    sfx.click();
+    const custom = $('#online-code-input').value.trim();
+    createTeam(custom);
+  };
+  $('#online-join-btn').onclick = ()=>{
+    sfx.click();
+    const code = $('#online-code-input').value.trim();
+    if(!code){ toast('Escribe el código de tu equipo primero.'); return; }
+    joinTeam(code);
+  };
+  $('#online-leave-btn').onclick = ()=>{ sfx.click(); leaveTeam(); };
+  $('#online-waiting-leave').onclick = ()=>{ sfx.click(); leaveTeam(); };
+}
+
+function genCode(){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let s=''; for(let i=0;i<5;i++) s+=chars[Math.floor(Math.random()*chars.length)];
+  return s;
+}
+function normalizeCode(raw){
+  return (raw||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8);
+}
+
+function createTeam(customCode){
+  const code = normalizeCode(customCode) || genCode();
+  initPeer(code, true);
+}
+function joinTeam(rawCode){
+  const code = normalizeCode(rawCode);
+  if(!code){ toast('Ese código no es válido.'); return; }
+  initPeer(code, false);
+}
+
+function initPeer(code, isHost){
+  if(!peerAvailable()){
+    toast('No se pudo activar el modo Online. Revisa tu conexión a internet.');
+    return;
+  }
+  destroyOnline();
+  online = {isHost, code, conns:new Map(), players:new Map(), myId:null, questions:null, topicLabel:'', challengeActive:false};
+  toast(isHost ? 'Creando equipo…' : 'Conectando con el equipo…');
+
+  let peer;
+  try{
+    peer = isHost ? new window.Peer(PEER_PREFIX+code) : new window.Peer();
+  }catch(e){
+    toast('No se pudo iniciar el modo Online en este navegador.');
+    online = null; return;
+  }
+  online.peer = peer;
+
+  peer.on('open', id=>{
+    online.myId = id;
+    if(isHost){
+      online.players.set(id, Object.assign({id}, myProfile(), {correct:0, finished:false, isHost:true}));
+      renderOnlineLobby();
+    } else {
+      const conn = peer.connect(PEER_PREFIX+code, {reliable:true});
+      online.hostConn = conn;
+      wireJoinerConn(conn);
+    }
+  });
+
+  peer.on('connection', conn=>{ if(online && online.isHost) wireHostConn(conn); });
+
+  peer.on('error', err=>{
+    let msg = 'No se pudo conectar. Revisa tu conexión a internet.';
+    if(err && err.type === 'unavailable-id') msg = 'Ese código de equipo ya está en uso — prueba con otro.';
+    if(err && err.type === 'peer-unavailable') msg = 'No encontramos ningún equipo con ese código.';
+    toast(msg);
+    if(!online || !online.myId){ destroyOnline(); renderOnline(); }
+  });
+}
+
+function wireHostConn(conn){
+  online.conns.set(conn.peer, conn);
+  conn.on('open', ()=>{
+    conn.on('data', data=> handleHostData(conn, data));
+  });
+  conn.on('close', ()=>{
+    online.conns.delete(conn.peer);
+    online.players.delete(conn.peer);
+    broadcastRoster();
+    renderOnlineLobby();
+  });
+}
+function handleHostData(conn, data){
+  if(!online) return;
+  if(data.type === 'hello'){
+    online.players.set(conn.peer, Object.assign({id:conn.peer}, data.profile, {correct:0, finished:false, isHost:false}));
+    broadcastRoster();
+    renderOnlineLobby();
+  } else if(data.type === 'progress'){
+    const p = online.players.get(conn.peer);
+    if(p){ p.correct = data.correct; p.finished = data.finished; broadcastTeam(); if(online.challengeActive) renderTeamBar(); checkAllFinished(); }
+  }
+}
+function broadcastRoster(){
+  if(!online || !online.isHost) return;
+  const players = [...online.players.values()];
+  online.conns.forEach(c=>{ try{ c.send({type:'roster', players}); }catch(e){} });
+}
+function broadcastTeam(){
+  if(!online || !online.isHost) return;
+  const players = [...online.players.values()];
+  const sum = players.reduce((a,p)=>a+p.correct,0);
+  const total = players.length*8;
+  online.conns.forEach(c=>{ try{ c.send({type:'team', players, sum, total}); }catch(e){} });
+}
+
+function wireJoinerConn(conn){
+  conn.on('open', ()=>{ conn.send({type:'hello', profile: myProfile()}); });
+  conn.on('data', data=> handleJoinerData(data));
+  conn.on('close', ()=>{
+    if(online){
+      toast('Se perdió la conexión con el equipo.');
+      cancelActiveQuiz();
+      destroyOnline();
+      renderOnline();
+      showScreen('online');
+    }
+  });
+}
+function handleJoinerData(data){
+  if(!online) return;
+  if(data.type === 'roster'){
+    online.players = new Map(data.players.map(p=>[p.id,p]));
+    renderOnlineLobby();
+  } else if(data.type === 'team'){
+    online.players = new Map(data.players.map(p=>[p.id,p]));
+    if(online.challengeActive) renderTeamBar();
+  } else if(data.type === 'start'){
+    online.questions = data.questions;
+    online.topicLabel = data.topicLabel;
+    beginOnlineChallenge();
+  } else if(data.type === 'end'){
+    online.challengeActive = false;
+    showOnlineEnd(data);
+  }
+}
+
+function currentPlayers(){ return online ? [...online.players.values()] : []; }
+
+function renderOnlineLobby(){
+  $('#online-home').hidden = true;
+  $('#online-waiting').hidden = true;
+  $('#online-lobby').hidden = false;
+  $('#online-code-display').textContent = online.code;
+
+  const roster = $('#online-roster');
+  roster.innerHTML = '';
+  currentPlayers().forEach(p=>{
+    const row = document.createElement('div');
+    row.className = 'roster-row';
+    row.innerHTML = `<span class="roster-avatar">${p.avatar}</span>
+      <span class="roster-name">${p.name}${p.isHost? ' <span class="roster-tag">Anfitrión</span>':''}</span>
+      <span class="roster-gear">${p.gear||''}</span>`;
+    roster.appendChild(row);
+  });
+
+  const topicWrap = $('#online-topic-picker');
+  const startBtn = $('#online-start-btn');
+  if(online.isHost){
+    topicWrap.hidden = false;
+    if(!topicWrap.dataset.built){
+      topicWrap.innerHTML = '<div class="field-label">Elige el tema del reto</div><div class="topic-chips" id="topic-chips"></div>';
+      const chipsWrap = topicWrap.querySelector('#topic-chips');
+      const options = [...REALMS.map(r=>({key:r.key, label:r.name})), {key:'mixed', label:'Mixto (todos los temas)'}];
+      let selected = 'mixed';
+      options.forEach(o=>{
+        const chip = document.createElement('button');
+        chip.className = 'topic-chip'+(o.key===selected?' active':'');
+        chip.textContent = o.label;
+        chip.onclick = ()=>{ selected = o.key; topicWrap.dataset.selected = o.key; sfx.click();
+          [...chipsWrap.children].forEach(c=>c.classList.remove('active'));
+          chip.classList.add('active');
+        };
+        chipsWrap.appendChild(chip);
+      });
+      topicWrap.dataset.built = '1';
+      topicWrap.dataset.selected = selected;
+    }
+    startBtn.hidden = false;
+    startBtn.textContent = 'Comenzar reto de equipo';
+    startBtn.onclick = ()=>{ sfx.click(); hostStartChallenge(topicWrap.dataset.selected || 'mixed'); };
+  } else {
+    topicWrap.hidden = true;
+    startBtn.hidden = true;
+  }
+}
+
+function hostStartChallenge(topicKey){
+  if(!online || !online.isHost) return;
+  const label = topicKey==='mixed' ? 'Reto mixto' : (REALMS.find(r=>r.key===topicKey)?.name || topicKey);
+  const questions = buildTopicPool(topicKey, 8);
+  online.questions = questions;
+  online.topicLabel = label;
+  online.players.forEach(p=>{ p.correct = 0; p.finished = false; });
+  online.conns.forEach(c=>{ try{ c.send({type:'start', questions, topicLabel:label}); }catch(e){} });
+  beginOnlineChallenge();
+}
+
+function beginOnlineChallenge(){
+  online.challengeActive = true;
+  quizCtx = {
+    realmKey:'online', realmName: online.topicLabel || 'Reto en equipo', color:'#33E4C2',
+    questions: online.questions, idx:0, correctCount:0, lives:3, combo:0, timer:null, timeLeft:20,
+    isBoss:false, isOnline:true, xpEarned:0, coinsEarned:0,
+  };
+  renderQuizChrome();
+  askQuestion();
+  showScreen('quiz');
+}
+
+function reportOnlineProgress(finished){
+  if(!online) return;
+  if(online.isHost){
+    const me = online.players.get(online.myId);
+    if(me){ me.correct = quizCtx.correctCount; me.finished = finished; }
+    broadcastTeam();
+    renderTeamBar();
+    checkAllFinished();
+  } else if(online.hostConn){
+    try{ online.hostConn.send({type:'progress', correct:quizCtx.correctCount, finished}); }catch(e){}
+  }
+}
+
+function renderTeamBar(){
+  const wrap = $('#quiz-teambar-wrap');
+  if(wrap.hidden) return;
+  const players = currentPlayers();
+  const sum = players.reduce((a,p)=>a+(p.correct||0),0);
+  const total = Math.max(1, players.length*8);
+  const pct = Math.min(100, Math.round((sum/total)*100));
+  $('#quiz-teambar-fill').style.width = pct+'%';
+  $('#quiz-teambar-label').textContent = 'Equipo: '+sum+' / '+total+' respuestas correctas';
+}
+
+function checkAllFinished(){
+  if(!online || !online.isHost || !online.challengeActive) return;
+  const players = currentPlayers();
+  if(players.length && players.every(p=>p.finished)){
+    hostEndChallenge();
+  }
+}
+
+function hostEndChallenge(){
+  if(!online || !online.isHost) return;
+  online.challengeActive = false;
+  const players = currentPlayers();
+  const sum = players.reduce((a,p)=>a+(p.correct||0),0);
+  const total = players.length*8;
+  const payload = {type:'end', players, sum, total};
+  online.conns.forEach(c=>{ try{ c.send(payload); }catch(e){} });
+  showOnlineEnd(payload);
+}
+
+function showOnlineWaiting(){
+  screens.quiz.hidden = true;
+  $('#online-home').hidden = true;
+  $('#online-lobby').hidden = true;
+  $('#online-waiting').hidden = false;
+  showScreen('online');
+  if(online && online.isHost) checkAllFinished();
+}
+
+function showOnlineEnd(payload){
+  const pct = payload.total ? payload.sum/payload.total : 0;
+  let stars = 0;
+  if(pct >= 0.9) stars = 3; else if(pct >= 0.7) stars = 2; else if(pct >= 0.4) stars = 1;
+  const me = payload.players.find(p=>p.id === online.myId) || {correct:0};
+  sfx.win(); burstCenter(['#33E4C2','#FFC857','#9B6BFF']);
+  showResult({
+    title: stars>0 ? '¡Reto en equipo superado!' : 'El equipo necesita más práctica',
+    subtitle: 'Entre todos sumaron '+payload.sum+' / '+payload.total+' respuestas correctas.',
+    stars, correct: me.correct||0, total: 8,
+    xp: 0, coins: 0,
+    onContinue: ()=>{ renderOnlineLobby(); showScreen('online'); },
+    onRetry: ()=>{ closeOverlay(); renderOnlineLobby(); showScreen('online'); },
+  });
+}
+
+function leaveTeam(){
+  destroyOnline();
+  renderOnline();
+}
+function destroyOnline(){
+  if(online && online.peer){ try{ online.peer.destroy(); }catch(e){} }
+  online = null;
+}
+
+/* ---------------- arranque ---------------- */
 function bootUI(){
   $('#hud-mute').onclick = ()=>{ state.muted = !state.muted; saveState(); renderHud(); sfx.click(); };
-  $('#hud-map-btn').onclick = ()=>{ if(state.started){ renderMap(); showScreen('map'); } };
   initWelcome();
+  initTabbar();
+  initOnlineScreen();
   renderHud();
   if(state.started){ renderMap(); showScreen('map'); }
   else { showScreen('welcome'); }
@@ -673,9 +1165,7 @@ function start(initialData){
   bootUI();
 
   if(window.claude && window.claude.hot){
-    try{
-      window.claude.hot.snapshot(()=> state);
-    }catch(e){}
+    try{ window.claude.hot.snapshot(()=> state); }catch(e){}
   }
 }
 

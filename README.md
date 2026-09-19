@@ -1,31 +1,86 @@
-# GrammarQuest — the Realms of English 🗺️✨
+# GrammarQuest — los Reinos del Inglés 🗺️✨
 
 Juego web de aventura para aprender inglés, pensado para estudiantes de
 **Octavo**. Sin frameworks, sin build: HTML + CSS + JavaScript puro, abre
-directo en el navegador o se publica en GitHub Pages en un click.
+directo en el navegador o se publica en GitHub Pages en un click. El menú
+y toda la navegación están en español; las preguntas quedan en inglés
+porque son el contenido que se está enseñando.
 
-## Temas cubiertos
+La app tiene tres apartados, accesibles desde la barra inferior:
 
-- **Present Village** — Present Simple & Present Continuous
-- **Past Ruins** — Past Simple & Past Continuous
-- **Passive Fortress** — Voz pasiva (presente y pasado)
-- **Adjective Gardens** — Comparativos, superlativos y orden de adjetivos
-- **Regular Forge** — Verbos regulares y reglas de ortografía del `-ed`
-- **Irregular Caves** — Verbos irregulares, como minijuego de memoria (memory match)
-- **The Grammar Dragon** — Batalla final: reto mixto de todos los temas, se
+- **🗺️ Temas** — el mapa de reinos gramaticales (modo individual).
+- **🌐 Online** — jugar en equipo con un código, en tiempo real.
+- **🎒 Tienda** — gastar las monedas ganadas en personalizar al héroe.
+
+## Temas cubiertos (apartado "Temas")
+
+- **Aldea del Presente** — Present Simple & Present Continuous
+- **Ruinas del Pasado** — Past Simple & Past Continuous
+- **Fortaleza Pasiva** — Voz pasiva (presente y pasado)
+- **Jardín de Adjetivos** — Comparativos, superlativos y orden de adjetivos
+- **Forja Regular** — Verbos regulares y reglas de ortografía del `-ed`
+- **Cuevas Irregulares** — Verbos irregulares, como minijuego de memoria (memory match)
+- **El Dragón Gramatical** — Batalla final: reto mixto de todos los temas, se
   desbloquea al ganar al menos ⭐ en cada reino
+
+## Modo Online (apartado "Online")
+
+Permite jugar en equipo (hasta ~4 jugadores recomendado) usando un
+**código de equipo**, sin necesidad de un servidor propio:
+
+1. Un jugador pulsa **"Crear equipo nuevo"** (o escribe un código
+   personalizado, por ejemplo el nombre del equipo) y comparte ese código
+   con sus compañeros — de viva voz, por WhatsApp, o escrito en el pizarrón.
+2. Los demás escriben el mismo código y pulsan **"Unirme con este código"**.
+3. En el lobby se ve la lista de compañeros conectados (con su personaje y
+   accesorios equipados). El anfitrión elige el tema y pulsa **"Comenzar
+   reto de equipo"**.
+4. Todos responden las mismas 8 preguntas a su propio ritmo; una barra de
+   progreso **compartida** se llena con las respuestas correctas de todo
+   el equipo. Al terminar todos, se muestra el resultado conjunto.
+
+Detalles técnicos: usa [PeerJS](https://peerjs.com/) (WebRTC) cargado
+desde jsDelivr — es decir, los navegadores se conectan **directamente
+entre sí** (peer-to-peer), sin pasar por un backend propio. Esto significa:
+
+- Se necesita conexión a internet, y funciona mejor en redes normales.
+  Algunas redes escolares muy restrictivas bloquean las conexiones
+  directas (WebRTC); si eso pasa, el modo Online puede fallar al conectar
+  — en ese caso, toca jugar en modo individual (apartado "Temas").
+- No hay una cuenta ni un servidor que mantener: el código de equipo es
+  temporal y solo existe mientras el anfitrión sigue conectado.
+- No pude probar una conexión real entre dos dispositivos distintos desde
+  este entorno de desarrollo (bloquea el tráfico saliente necesario), así
+  que vale la pena que lo prueben ustedes con dos navegadores/dispositivos
+  reales antes de usarlo en clase.
+
+## Tienda y personalización (apartado "Tienda")
+
+Las monedas que se ganan respondiendo correctamente (o completando el
+memory de verbos irregulares) se gastan en 4 categorías de artículos:
+
+- **Personajes** — avatares alternativos (unicornio, robot, dinosaurio, dragón, alien, rey...).
+- **Sombreros** — gorra, corona, casco, birrete, lentes de sol...
+- **Vehículos** — auto deportivo, patrulla, tanque, helicóptero, cohete...
+- **Comida** — pizza, taco, helado, hamburguesa...
+
+Lo que el jugador equipa se ve junto a su nombre en el HUD, en el mapa y,
+sobre todo, en la lista de compañeros del **lobby Online** — así que la
+personalización tiene un uso real dentro de los modos de juego, no es
+solo decorativa.
 
 ## Mecánicas de juego
 
 - Mapa tipo "camino de aventura" con reinos que se van desbloqueando.
 - Preguntas de opción múltiple con temporizador, corazones (vidas) y racha
-  de combo con bonus de XP.
+  con bonus de XP.
 - Sistema de nivel, experiencia (XP) y monedas, guardado en `localStorage`
   del navegador (el progreso es por dispositivo/navegador).
 - Minijuego de memoria (cartas) para los verbos irregulares.
-- Batalla final contra "el Dragón de la Gramática" con barra de vida.
+- Batalla final contra "el Dragón Gramatical" con barra de vida.
 - Efectos de sonido sintetizados con Web Audio (sin archivos externos) y
-  confeti en Canvas al acertar. Todo funciona offline una vez cargado.
+  confeti en Canvas al acertar. El modo individual funciona offline una
+  vez cargado; el modo Online necesita internet.
 
 ## Cómo jugarlo
 
@@ -65,3 +120,10 @@ El último número es el índice (empezando en 0) de la opción correcta.
 Puedes agregar tantas preguntas como quieras a cada arreglo — el juego
 elige 8 al azar en cada intento, así que un banco más grande da más
 variedad.
+
+## Personalizar la tienda
+
+Los artículos de la tienda viven en `game.js`, en el objeto `SHOP`
+(categorías `personajes`, `sombreros`, `vehiculos`, `comida`). Cada
+artículo es `{id, icon, name, price}` — `price: 0` lo deja gratis desde
+el principio (los personajes iniciales funcionan así).
