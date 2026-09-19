@@ -156,31 +156,25 @@ button{font-family:inherit;}
 }
 .text-input:focus{outline:2px solid var(--violet); outline-offset:1px;}
 
-/* ---------- map ---------- */
-.map-path{position:relative; display:flex; flex-direction:column; gap:0; padding:6px 0 10px;}
-.map-line{
-  position:absolute; left:50%; top:30px; bottom:30px; width:4px; margin-left:-2px;
-  background:repeating-linear-gradient(180deg, var(--line-strong) 0 10px, transparent 10px 20px);
-  z-index:0;
+/* ---------- mode grid (cada tema, separado) ---------- */
+.mode-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+.mode-card{
+  --mode-color: var(--violet);
+  display:flex; flex-direction:column; align-items:center; text-align:center; gap:4px;
+  border-radius:20px; border:2px solid var(--line-strong); cursor:pointer;
+  background:linear-gradient(180deg, var(--bg-panel), var(--bg-mid));
+  padding:16px 10px; box-shadow:var(--shadow-md); font-family:var(--font-body); color:var(--ink);
+  position:relative; overflow:hidden;
 }
-.realm-row{position:relative; z-index:1; display:flex; align-items:center; gap:14px; padding:12px 4px;}
-.realm-row.right{flex-direction:row-reverse; text-align:right;}
-.realm-node{
-  width:74px; height:74px; border-radius:50%; flex:none;
-  display:flex; align-items:center; justify-content:center; font-size:32px;
-  border:3px solid var(--line-strong);
-  background:radial-gradient(circle at 32% 28%, var(--bg-panel-2), var(--bg-deep));
-  cursor:pointer; position:relative;
-  box-shadow:var(--shadow-md);
+.mode-card::before{
+  content:''; position:absolute; inset:0 0 auto 0; height:4px; background:var(--mode-color);
 }
-.realm-node.locked{opacity:.45; cursor:not-allowed; filter:grayscale(.6);}
-.realm-node.done{border-color:var(--gold);}
-.realm-node .lock-ic{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:22px;}
-.realm-info{flex:1; min-width:0;}
-.realm-name{font-family:var(--font-display); font-weight:700; font-size:15.5px;}
-.realm-desc{font-size:12px; color:var(--ink-dim); margin-top:2px;}
-.realm-stars{display:flex; gap:2px; margin-top:5px; font-size:13px;}
-.realm-row.right .realm-stars{justify-content:flex-end;}
+.mode-card.done{border-color:var(--mode-color);}
+.mode-card.locked{opacity:.5; cursor:not-allowed; filter:grayscale(.5);}
+.mode-icon{font-size:34px; line-height:1;}
+.mode-name{font-family:var(--font-display); font-weight:700; font-size:14.5px; margin-top:2px;}
+.mode-desc{font-size:11px; color:var(--ink-dim); line-height:1.3;}
+.realm-stars{display:flex; gap:2px; margin-top:2px; font-size:13px;}
 .star{color:rgba(255,255,255,.2);}
 .star.on{color:var(--gold);}
 .boss-node{
@@ -359,6 +353,34 @@ button{font-family:inherit;}
   background:rgba(255,255,255,.05); color:var(--ink-dim); padding:7px 12px; cursor:pointer; font-family:var(--font-body);
 }
 .topic-chip.active{border-color:var(--gold); background:rgba(255,200,87,.16); color:var(--ink);}
+
+/* ---------- escenario 3D del personaje ---------- */
+.hero-stage{
+  position:relative;
+  height:190px;
+  border-radius:var(--radius-lg);
+  border:1px solid var(--line);
+  background:
+    radial-gradient(120px 80px at 50% 78%, rgba(255,200,87,.16), transparent 70%),
+    radial-gradient(220px 160px at 50% 20%, rgba(155,107,255,.28), transparent 65%),
+    linear-gradient(180deg, var(--bg-panel), var(--bg-deep));
+  box-shadow:var(--shadow-md);
+  overflow:hidden;
+  touch-action:none;
+}
+#hero-canvas{width:100%; height:100%; display:block; cursor:grab;}
+#hero-canvas:active{cursor:grabbing;}
+.hero-caption{
+  position:absolute; left:0; right:0; bottom:8px; text-align:center;
+  font-size:11px; color:var(--ink-faint); pointer-events:none;
+}
+.hero-fallback{
+  position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+}
+.hero-fallback-avatar{font-size:64px; filter:drop-shadow(0 10px 16px rgba(124,77,255,.4));}
+.hero-fallback-gear{font-size:22px; letter-spacing:6px;}
+.hero-stage.stage-fallback #hero-canvas{display:none;}
+.hero-stage.stage-fallback .hero-caption{display:none;}
 
 /* ---------- team progress bar (quiz online) ---------- */
 .teambar-wrap{padding:2px 0;}

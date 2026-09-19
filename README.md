@@ -8,9 +8,24 @@ porque son el contenido que se está enseñando.
 
 La app tiene tres apartados, accesibles desde la barra inferior:
 
-- **🗺️ Temas** — el mapa de reinos gramaticales (modo individual).
+- **🗺️ Temas** — cada tema gramatical es su propia tarjeta independiente
+  (modo individual).
 - **🌐 Online** — jugar en equipo con un código, en tiempo real.
 - **🎒 Tienda** — gastar las monedas ganadas en personalizar al héroe.
+
+## El personaje en 3D
+
+Arriba de "Temas" y de "Tienda" hay un escenario 3D (con
+[Three.js](https://threejs.org/)) donde el héroe gira sobre una
+plataforma mostrando lo que tiene equipado: sombrero, vehículo y comida
+aparecen junto a él en la escena. Se puede arrastrar con el dedo/mouse
+para girarlo. Al comprar o equipar algo nuevo en la Tienda, el cambio se
+ve ahí mismo al instante.
+
+Si el navegador no soporta WebGL o la librería no llega a cargar (por
+ejemplo, por un firewall muy restrictivo), el escenario cae de forma
+automática a una versión plana (el avatar y sus accesorios como emoji
+grandes) — el juego sigue funcionando igual, solo sin el giro 3D.
 
 ## Temas cubiertos (apartado "Temas")
 

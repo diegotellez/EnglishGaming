@@ -350,6 +350,7 @@ function showScreen(name){
   screens[name].hidden = false;
   window.scrollTo({top:0, behavior: reduceMotion ? 'auto' : 'smooth'});
   [...tabbar.children].forEach(b=>b.classList.toggle('active', b.dataset.tab===name));
+  setHeroStageVisible(name === 'map' || name === 'shop');
 }
 
 function renderHud(){
@@ -366,6 +367,145 @@ function renderHud(){
   $('#hud-mute').textContent = state.muted ? '🔇' : '🔊';
 }
 
+/* ---------------- escenario 3D del personaje ---------------- */
+let three = null;
+const heroStageEl = $('#hero-stage');
+
+function webglSupported(){
+  try{
+    const c = document.createElement('canvas');
+    return !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl')));
+  }catch(e){ return false; }
+}
+
+function makeEmojiTexture(emoji, size){
+  size = size || 128;
+  const c = document.createElement('canvas'); c.width = c.height = size;
+  const cx = c.getContext('2d');
+  cx.clearRect(0,0,size,size);
+  cx.font = Math.floor(size*0.75)+'px "Segoe UI Emoji","Noto Color Emoji",system-ui,sans-serif';
+  cx.textAlign = 'center'; cx.textBaseline = 'middle';
+  cx.fillText(emoji, size/2, size/2 + size*0.05);
+  const tex = new THREE.CanvasTexture(c);
+  tex.needsUpdate = true;
+  return tex;
+}
+
+function initHeroStage(){
+  const canvas = $('#hero-canvas');
+  if(typeof THREE === 'undefined' || !webglSupported()){
+    heroStageEl.classList.add('stage-fallback');
+    $('#hero-fallback').hidden = false;
+    return;
+  }
+  try{
+    const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio||1));
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 50);
+    camera.position.set(0, 1.35, 5.3);
+    camera.lookAt(0, 0.9, 0);
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.85));
+    const dir = new THREE.DirectionalLight(0xffffff, 0.9);
+    dir.position.set(2,4,3);
+    scene.add(dir);
+
+    const platform = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.5, 1.6, 0.18, 48),
+      new THREE.MeshStandardMaterial({color:0x7C4DFF, emissive:0x3a1f8f, emissiveIntensity:0.5, metalness:0.3, roughness:0.4})
+    );
+    platform.position.y = -0.75;
+    scene.add(platform);
+
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(1.62, 0.03, 8, 60),
+      new THREE.MeshBasicMaterial({color:0xFFC857})
+    );
+    ring.rotation.x = Math.PI/2; ring.position.y = -0.65;
+    scene.add(ring);
+
+    const group = new THREE.Group();
+    scene.add(group);
+
+    function billboard(size){
+      const spr = new THREE.Sprite(new THREE.SpriteMaterial({transparent:true}));
+      spr.scale.set(size,size,1);
+      return spr;
+    }
+    const avatarSprite = billboard(2.1); avatarSprite.position.set(0,0.55,0);
+    const hatSprite = billboard(1.0); hatSprite.position.set(0,1.7,0.05);
+    const vehicleSprite = billboard(1.4); vehicleSprite.position.set(1.2,-0.2,-0.25);
+    const foodSprite = billboard(0.65); foodSprite.position.set(-1.15,0.0,0.15);
+    group.add(avatarSprite, hatSprite, vehicleSprite, foodSprite);
+
+    three = {renderer, scene, camera, group, avatarSprite, hatSprite, vehicleSprite, foodSprite, dragging:false, lastX:0, rotY:0.5};
+
+    canvas.addEventListener('pointerdown', e=>{ three.dragging = true; three.lastX = e.clientX; canvas.setPointerCapture(e.pointerId); });
+    canvas.addEventListener('pointerup', ()=>{ three.dragging = false; });
+    canvas.addEventListener('pointercancel', ()=>{ three.dragging = false; });
+    canvas.addEventListener('pointermove', e=>{
+      if(!three.dragging) return;
+      const dx = e.clientX - three.lastX; three.lastX = e.clientX;
+      three.rotY += dx*0.012;
+    });
+
+    updateHeroStage();
+    resizeHeroStage();
+    requestAnimationFrame(animateHeroStage);
+  }catch(e){
+    three = null;
+    heroStageEl.classList.add('stage-fallback');
+    $('#hero-fallback').hidden = false;
+  }
+}
+
+function resizeHeroStage(){
+  if(!three) return;
+  const canvas = three.renderer.domElement;
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  if(!w || !h) return;
+  three.renderer.setSize(w, h, false);
+  three.camera.aspect = w/h;
+  three.camera.updateProjectionMatrix();
+}
+addEventListener('resize', resizeHeroStage);
+
+function animateHeroStage(){
+  if(!three) return;
+  requestAnimationFrame(animateHeroStage);
+  if(heroStageEl.hidden) return;
+  if(!three.dragging && !reduceMotion){ three.rotY += 0.006; }
+  three.group.rotation.y = three.rotY;
+  three.renderer.render(three.scene, three.camera);
+}
+
+function updateHeroStage(){
+  $('#hero-fallback-avatar').textContent = state.avatar;
+  $('#hero-fallback-gear').textContent = gearIcons();
+  if(!three) return;
+  three.avatarSprite.material.map = makeEmojiTexture(state.avatar, 160);
+  three.avatarSprite.material.needsUpdate = true;
+
+  const hat = equippedItem('sombreros');
+  three.hatSprite.visible = !!hat;
+  if(hat){ three.hatSprite.material.map = makeEmojiTexture(hat.icon, 120); three.hatSprite.material.needsUpdate = true; }
+
+  const veh = equippedItem('vehiculos');
+  three.vehicleSprite.visible = !!veh;
+  if(veh){ three.vehicleSprite.material.map = makeEmojiTexture(veh.icon, 140); three.vehicleSprite.material.needsUpdate = true; }
+
+  const food = equippedItem('comida');
+  three.foodSprite.visible = !!food;
+  if(food){ three.foodSprite.material.map = makeEmojiTexture(food.icon, 100); three.foodSprite.material.needsUpdate = true; }
+}
+
+function setHeroStageVisible(show){
+  heroStageEl.hidden = !show;
+  if(show) requestAnimationFrame(resizeHeroStage);
+}
+
 /* ---------------- pantalla de bienvenida ---------------- */
 function initWelcome(){
   const grid = $('#avatar-grid');
@@ -378,6 +518,7 @@ function initWelcome(){
     b.onclick = ()=>{ state.avatar = av; sfx.click();
       [...grid.children].forEach(c=>c.classList.remove('selected'));
       b.classList.add('selected');
+      updateHeroStage();
     };
     grid.appendChild(b);
   });
@@ -418,27 +559,22 @@ function starsHtml(count){
 }
 function renderMap(){
   const wrap = $('#map-path');
-  wrap.innerHTML = '<div class="map-line"></div>';
+  wrap.innerHTML = '';
   let prevDone = true;
-  REALMS.forEach((r,i)=>{
+  REALMS.forEach(r=>{
     const unlocked = prevDone;
     const stars = state.stars[r.key]||0;
-    const row = document.createElement('div');
-    row.className = 'realm-row'+(i%2? ' right':'');
-    row.innerHTML = `
-      <button class="realm-node ${unlocked?'':'locked'} ${stars>0?'done':''}" style="border-color:${unlocked? r.color:'var(--line-strong)'}" data-key="${r.key}" ${unlocked?'':'disabled aria-disabled="true"'}>
-        ${unlocked? r.icon : `<span class="lock-ic">🔒</span>`}
-      </button>
-      <div class="realm-info">
-        <div class="realm-name">${r.name}</div>
-        <div class="realm-desc">${r.desc}</div>
-        <div class="realm-stars">${starsHtml(stars)}</div>
-      </div>`;
-    wrap.appendChild(row);
-    const btn = row.querySelector('.realm-node');
-    if(unlocked){
-      btn.onclick = ()=>{ sfx.click(); openRealm(r.key); };
-    }
+    const card = document.createElement('button');
+    card.className = 'mode-card'+(unlocked?'':' locked')+(stars>0?' done':'');
+    card.style.setProperty('--mode-color', r.color);
+    if(!unlocked){ card.disabled = true; card.setAttribute('aria-disabled','true'); }
+    card.innerHTML = `
+      <div class="mode-icon">${unlocked? r.icon : '🔒'}</div>
+      <div class="mode-name">${r.name}</div>
+      <div class="mode-desc">${r.desc}</div>
+      <div class="realm-stars">${starsHtml(stars)}</div>`;
+    if(unlocked){ card.onclick = ()=>{ sfx.click(); openRealm(r.key); }; }
+    wrap.appendChild(card);
     prevDone = stars > 0;
   });
 
@@ -821,7 +957,7 @@ function handleShopClick(item, owned, isEquipped, equippedField){
       sfx.buy();
     } else { sfx.click(); }
     state.avatar = item.icon;
-    saveState(); renderHud(); renderShop();
+    saveState(); renderHud(); renderShop(); updateHeroStage();
     return;
   }
   if(isEquipped){
@@ -837,7 +973,7 @@ function handleShopClick(item, owned, isEquipped, equippedField){
     state.equipped[equippedField] = item.id;
     sfx.buy(); burstCenter(['#FFC857','#33E4C2']);
   }
-  saveState(); renderHud(); renderShop();
+  saveState(); renderHud(); renderShop(); updateHeroStage();
 }
 
 /* ---------------- Online: código de equipo (PeerJS, sin backend propio) ---------------- */
@@ -1153,6 +1289,7 @@ function bootUI(){
   initWelcome();
   initTabbar();
   initOnlineScreen();
+  initHeroStage();
   renderHud();
   if(state.started){ renderMap(); showScreen('map'); }
   else { showScreen('welcome'); }

@@ -22,6 +22,15 @@
     <button class="hud-btn" id="hud-mute" title="Silenciar" aria-label="Activar o silenciar sonido">🔊</button>
   </header>
 
+  <div id="hero-stage" class="hero-stage" hidden>
+    <canvas id="hero-canvas"></canvas>
+    <div class="hero-fallback" id="hero-fallback" hidden>
+      <div class="hero-fallback-avatar" id="hero-fallback-avatar">🧙‍♀️</div>
+      <div class="hero-fallback-gear" id="hero-fallback-gear"></div>
+    </div>
+    <div class="hero-caption">👆 Arrastra para girar a tu personaje</div>
+  </div>
+
   <main>
     <!-- BIENVENIDA -->
     <section id="screen-welcome" class="screen">
@@ -46,7 +55,7 @@
     <section id="screen-map" class="screen" hidden>
       <div class="eyebrow" style="text-align:center;">Temas</div>
       <h2 class="title-xl" style="font-size:24px; text-align:center;">Elige un reino para explorar</h2>
-      <div class="map-path" id="map-path"></div>
+      <div class="mode-grid" id="map-path"></div>
       <div id="boss-node" class="boss-node"></div>
     </section>
 
@@ -150,6 +159,7 @@
 
   <p class="footer-note">Hecho para estudiantes de Octavo · GrammarQuest</p>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.2/dist/peerjs.min.js"></script>
 <script src="game.js"></script>
 </body>
