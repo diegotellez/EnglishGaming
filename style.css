@@ -409,6 +409,15 @@ button{font-family:inherit;}
 }
 .faq-title{font-family:var(--font-display); font-weight:700; font-size:14px; color:var(--teal);}
 
+/* ---------- Mundo ---------- */
+.world-scroll{
+  width:100%; height:380px; overflow-x:auto; overflow-y:hidden;
+  border-radius:var(--radius-lg); border:2px solid var(--line-strong);
+  background:#8FBF6B; box-shadow:var(--shadow-md);
+  -webkit-overflow-scrolling:touch;
+}
+#world-canvas{display:block; height:380px; touch-action:pan-x;}
+
 /* ---------- team progress bar (quiz online) ---------- */
 .teambar-wrap{padding:2px 0;}
 .teambar-track{height:12px; border-radius:999px; background:rgba(36,26,16,.1); overflow:hidden; border:1px solid var(--line);}

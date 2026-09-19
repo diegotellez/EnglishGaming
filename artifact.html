@@ -95,11 +95,32 @@
       <div class="shop-grid" id="shop-grid"></div>
     </section>
 
+    <!-- MUNDO -->
+    <section id="screen-world" class="screen" hidden>
+      <div class="eyebrow" style="text-align:center;">Mundo</div>
+      <h2 class="title-xl" style="font-size:22px; text-align:center;">Explora el Gran Espectáculo en 2D</h2>
+
+      <div id="world-setup">
+        <p class="subtitle">Elige al menos 5 temas — entre más elijas, más grande y variado será el mundo. Te sugerimos los que más practicas (según tus datos reales del Coach).</p>
+        <div class="topic-chips" id="world-topic-picker"></div>
+        <p class="footer-note" id="world-count-label" style="text-align:center; margin-top:8px;"></p>
+        <button class="btn btn-primary btn-block" id="world-build-btn" style="margin-top:10px;">Construir mi mundo</button>
+      </div>
+
+      <div id="world-map-wrap" hidden>
+        <div class="world-scroll" id="world-scroll">
+          <canvas id="world-canvas"></canvas>
+        </div>
+        <p class="footer-note" style="text-align:center;">Toca el mapa para caminar. Toca a un personaje para hablar con él y empezar su reto.</p>
+        <button class="btn btn-ghost btn-block" id="world-edit-btn">Elegir otros temas</button>
+      </div>
+    </section>
+
     <!-- COACH -->
     <section id="screen-coach" class="screen" hidden>
       <div class="eyebrow" style="text-align:center;">Coach</div>
       <h2 class="title-xl" style="font-size:22px; text-align:center;">Tu entrenador de inglés</h2>
-      <p class="subtitle">Analiza tus respuestas reales para mostrarte en qué necesitas practicar más, y te ayuda a resolver dudas rápidas de inglés.</p>
+      <p class="subtitle">Tus resultados reales: en qué tema vas mejor, cuál te cuesta más, y tus últimos errores concretos.</p>
 
       <div class="card">
         <div class="eyebrow">Tu rendimiento por tema</div>
@@ -111,16 +132,6 @@
       <div class="card">
         <div class="eyebrow">Tus últimos errores</div>
         <div id="coach-mistakes"></div>
-      </div>
-
-      <div class="card">
-        <div class="eyebrow">Pregúntale a tu Coach</div>
-        <div class="coach-search-row">
-          <input class="text-input" id="coach-search-input" placeholder="Ej: cuándo uso &quot;did&quot;, orden de adjetivos...">
-          <button class="btn btn-primary" id="coach-search-btn">Buscar</button>
-        </div>
-        <div id="coach-search-results"></div>
-        <p class="footer-note" style="text-align:left; margin-top:8px;">Este Coach busca en una guía de consejos preparada de antemano — no es una IA conectada a internet, así que funciona siempre, incluso sin conexión.</p>
       </div>
     </section>
 
@@ -170,6 +181,7 @@
 
   <nav id="tabbar" class="tabbar" hidden>
     <button class="tab-btn active" data-tab="map"><span class="tab-ic">🎬</span>Temas</button>
+    <button class="tab-btn" data-tab="world"><span class="tab-ic">🗺️</span>Mundo</button>
     <button class="tab-btn" data-tab="online"><span class="tab-ic">🌐</span>Online</button>
     <button class="tab-btn" data-tab="shop"><span class="tab-ic">🎩</span>Tienda</button>
     <button class="tab-btn" data-tab="coach"><span class="tab-ic">🧠</span>Coach</button>

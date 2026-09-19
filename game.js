@@ -289,6 +289,7 @@ function defaultState(){
     inventory:{personajes:[], sombreros:[], vehiculos:[], comida:[]},
     equipped:{personaje:null, sombreros:null, vehiculos:null, comida:null},
     stats:{byTopic: defaultStatsByTopic(), recentMistakes:[]},
+    world:null,
   };
 }
 
@@ -440,6 +441,7 @@ const screens = {
   shop: $('#screen-shop'),
   online: $('#screen-online'),
   coach: $('#screen-coach'),
+  world: $('#screen-world'),
 };
 let overlay = null;
 
@@ -578,6 +580,7 @@ function initTabbar(){
       else if(tab === 'shop'){ renderShop(); showScreen('shop'); }
       else if(tab === 'online'){ renderOnline(); showScreen('online'); }
       else if(tab === 'coach'){ renderCoach(); showScreen('coach'); }
+      else if(tab === 'world'){ renderWorld(); showScreen('world'); }
     };
   });
 }
@@ -604,7 +607,7 @@ function renderMap(){
       <div class="mode-name">${r.name}</div>
       <div class="mode-desc">${r.desc}</div>
       <div class="realm-stars">${starsHtml(stars)}</div>`;
-    card.onclick = ()=>{ sfx.click(); openRealm(r.key); };
+    card.onclick = ()=>{ sfx.click(); quizReturnScreen = 'map'; openRealm(r.key); };
     wrap.appendChild(card);
   });
 
@@ -612,7 +615,7 @@ function renderMap(){
   bossBox.className = 'boss-node ready';
   bossBox.innerHTML = `<div style="font-size:40px;">🖋️</div><h3>El Profesor Tinta</h3><p class="footer-note" style="font-size:12.5px;">¡Enfréntate al reto final mixto!</p>
        <button class="btn btn-gold btn-block" id="boss-btn">${state.bossCleared? 'Jugar otra vez' : 'Iniciar batalla final'}</button>`;
-  $('#boss-btn').onclick = ()=>{ sfx.click(); startBoss(); };
+  $('#boss-btn').onclick = ()=>{ sfx.click(); quizReturnScreen = 'map'; startBoss(); };
 }
 
 function openRealm(key){
@@ -622,6 +625,11 @@ function openRealm(key){
 
 /* ---------------- motor de preguntas ---------------- */
 let quizCtx = null;
+let quizReturnScreen = 'map';
+function goToQuizReturnScreen(){
+  if(quizReturnScreen === 'world'){ renderWorld(); showScreen('world'); }
+  else { renderMap(); showScreen('map'); }
+}
 
 function sample(arr, n){
   const copy = arr.slice();
@@ -818,7 +826,7 @@ function finishQuiz(){
       title: stars>0 ? '¡Atracción superada!' : '¡Sigue practicando!',
       stars, correct: quizCtx.correctCount, total,
       xp: quizCtx.xpEarned, coins: quizCtx.coinsEarned,
-      onContinue: ()=>{ renderMap(); showScreen('map'); },
+      onContinue: goToQuizReturnScreen,
       onRetry: ()=>{ closeOverlay(); startQuiz(quizCtx.realmKey); },
     });
     if(stars>0){ sfx.win(); burstCenter([quizCtx.color,'#D9A429','#1F7A68']); }
@@ -833,7 +841,7 @@ function showBossResult(won, ctx){
     correct: ctx.correctCount, total: ctx.questions.length,
     xp: ctx.xpEarned, coins: ctx.coinsEarned,
     subtitle: won ? '¡Eres el campeón de la gramática del Gran Espectáculo!' : 'Repasa las atracciones e inténtalo de nuevo — ¡tú puedes!',
-    onContinue: ()=>{ renderMap(); showScreen('map'); },
+    onContinue: goToQuizReturnScreen,
     onRetry: ()=>{ closeOverlay(); startBoss(); },
   });
 }
@@ -946,7 +954,7 @@ function finishMemory(){
       title:'¡Tren Fantasma superado!', stars, correct:memCtx.total, total:memCtx.total,
       xp, coins,
       subtitle: 'Movimientos usados: '+memCtx.moves,
-      onContinue: ()=>{ renderMap(); showScreen('map'); },
+      onContinue: goToQuizReturnScreen,
       onRetry: ()=>{ closeOverlay(); startMemory(); },
     });
   }, 400);
@@ -1073,24 +1081,269 @@ function renderCoach(){
   }
 }
 
-function initCoachScreen(){
-  const input = $('#coach-search-input');
-  const results = $('#coach-search-results');
-  function runSearch(){
-    const matches = matchFAQ(input.value);
-    if(!input.value.trim()){ results.innerHTML = ''; return; }
-    if(!matches.length){
-      results.innerHTML = `<div class="faq-card"><p class="subtitle" style="text-align:left; margin:0;">No encontré nada para "${input.value}". Prueba con otra palabra, por ejemplo "pasado", "comparativos" o "voz pasiva".</p></div>`;
-      return;
-    }
-    results.innerHTML = matches.map(t=>`
-      <div class="faq-card">
-        <div class="faq-title">${t.title}</div>
-        <p class="subtitle" style="text-align:left; margin:4px 0 0;">${t.body}</p>
-      </div>`).join('');
+/* ---------------- Mundo: mapa 2D (campo / pueblo / ciudad) ---------------- */
+
+const ZONE_OF = {present:'pueblo', past:'ciudad', passive:'ciudad', adjectives:'pueblo', regular:'ciudad', irregular:'campo'};
+const ZONE_ORDER = ['campo','pueblo','ciudad'];
+const ZONE_GROUND = {campo:'#8FBF6B', pueblo:'#D9C08A', ciudad:'#B9B9B9'};
+
+let world = null;
+let worldLoopId = 0;
+let worldSetupSelection = new Set();
+
+function suggestedTopics(){
+  return REALMS.map(r=>r.key).sort((a,b)=> ensureTopicStats(b).attempts - ensureTopicStats(a).attempts);
+}
+
+function initWorldScreen(){
+  $('#world-build-btn').onclick = ()=>{
+    sfx.click();
+    state.world = {topics: [...worldSetupSelection]};
+    saveState();
+    showWorldMapView();
+  };
+  $('#world-edit-btn').onclick = ()=>{
+    sfx.click();
+    if(state.world && state.world.topics) worldSetupSelection = new Set(state.world.topics);
+    showWorldSetupView();
+  };
+}
+
+function renderWorld(){
+  if(state.world && state.world.topics && state.world.topics.length >= 5){
+    worldSetupSelection = new Set(state.world.topics);
+    showWorldMapView();
+  } else {
+    worldSetupSelection = new Set();
+    showWorldSetupView();
   }
-  $('#coach-search-btn').onclick = ()=>{ sfx.click(); runSearch(); };
-  input.addEventListener('keydown', e=>{ if(e.key==='Enter'){ sfx.click(); runSearch(); } });
+}
+
+function showWorldSetupView(){
+  $('#world-setup').hidden = false;
+  $('#world-map-wrap').hidden = true;
+  renderWorldSetup();
+}
+function showWorldMapView(){
+  $('#world-setup').hidden = true;
+  $('#world-map-wrap').hidden = false;
+  buildWorldMap([...worldSetupSelection]);
+}
+
+function renderWorldSetup(){
+  const wrap = $('#world-topic-picker');
+  wrap.innerHTML = '';
+  if(worldSetupSelection.size === 0){
+    const ranked = suggestedTopics();
+    const hasData = REALMS.some(r=> ensureTopicStats(r.key).attempts > 0);
+    const preset = hasData ? ranked.slice(0,5) : REALMS.map(r=>r.key);
+    preset.forEach(k=>worldSetupSelection.add(k));
+  }
+  REALMS.forEach(r=>{
+    const on = worldSetupSelection.has(r.key);
+    const chip = document.createElement('button');
+    chip.className = 'topic-chip'+(on?' active':'');
+    chip.innerHTML = `${r.icon} ${r.name}`;
+    chip.onclick = ()=>{
+      sfx.click();
+      if(on) worldSetupSelection.delete(r.key); else worldSetupSelection.add(r.key);
+      renderWorldSetup();
+    };
+    wrap.appendChild(chip);
+  });
+  $('#world-count-label').textContent = worldSetupSelection.size+' / 6 temas elegidos (mínimo 5) — sugeridos según lo que más practicas en el Coach';
+  $('#world-build-btn').disabled = worldSetupSelection.size < 5;
+}
+
+function drawTree(ctx,x,y){
+  ctx.fillStyle = '#6B4226'; ctx.fillRect(x-6,y+20,12,30);
+  ctx.beginPath(); ctx.arc(x,y,26,0,Math.PI*2); ctx.fillStyle='#3E7D4F'; ctx.fill();
+  ctx.lineWidth=3; ctx.strokeStyle='#241A10'; ctx.stroke();
+}
+function drawHouse(ctx,x,y){
+  ctx.fillStyle='#E8B96B'; ctx.fillRect(x-30,y+30,60,50);
+  ctx.strokeStyle='#241A10'; ctx.lineWidth=3; ctx.strokeRect(x-30,y+30,60,50);
+  ctx.beginPath(); ctx.moveTo(x-38,y+30); ctx.lineTo(x,y-10); ctx.lineTo(x+38,y+30); ctx.closePath();
+  ctx.fillStyle='#8E1B2B'; ctx.fill(); ctx.stroke();
+}
+function drawBuilding(ctx,x,y,w,h){
+  ctx.fillStyle='#D8D2C2'; ctx.fillRect(x,y,w,h);
+  ctx.strokeStyle='#241A10'; ctx.lineWidth=3; ctx.strokeRect(x,y,w,h);
+  ctx.fillStyle='#8A7358';
+  for(let ry=y+14; ry<y+h-10; ry+=22){
+    for(let rx=x+10; rx<x+w-10; rx+=20){ ctx.fillRect(rx,ry,10,12); }
+  }
+}
+function drawNpc(ctx,n,active){
+  ctx.save();
+  ctx.beginPath(); ctx.ellipse(n.x, n.y+34, 20,7,0,0,Math.PI*2); ctx.fillStyle='rgba(0,0,0,.18)'; ctx.fill();
+  ctx.beginPath(); ctx.arc(n.x, n.y, 26, 0, Math.PI*2);
+  ctx.fillStyle = n.color; ctx.fill();
+  ctx.lineWidth = active?5:3.5; ctx.strokeStyle = '#241A10'; ctx.stroke();
+  ctx.font='26px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(n.icon, n.x, n.y+1);
+  ctx.font='bold 11px Nunito, sans-serif'; ctx.fillStyle='#241A10';
+  ctx.fillText(n.name.split(' ').slice(0,3).join(' '), n.x, n.y+48);
+  ctx.restore();
+}
+function drawPlayer(ctx,p){
+  ctx.save();
+  ctx.beginPath(); ctx.ellipse(p.x,p.y+18,16,6,0,0,Math.PI*2); ctx.fillStyle='rgba(0,0,0,.2)'; ctx.fill();
+  ctx.beginPath(); ctx.arc(p.x,p.y,20,0,Math.PI*2);
+  ctx.fillStyle = currentCharTint(); ctx.fill();
+  ctx.lineWidth=4; ctx.strokeStyle='#241A10'; ctx.stroke();
+  ctx.font='22px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(state.avatar, p.x, p.y);
+  ctx.restore();
+}
+
+function buildWorldMap(topics){
+  const canvas = $('#world-canvas');
+  const ctx = canvas.getContext('2d');
+
+  const zones = {campo:[], pueblo:[], ciudad:[]};
+  topics.forEach(k=> zones[ZONE_OF[k]].push(k));
+
+  const SLOT_W = 220, PAD = 160;
+  let x = 0;
+  const zoneLayout = [];
+  ZONE_ORDER.forEach(zone=>{
+    const count = zones[zone].length;
+    const width = Math.max(260, count*SLOT_W) + PAD;
+    zoneLayout.push({zone, x0:x, width, topics:zones[zone]});
+    x += width;
+  });
+  const bossX = x + 90;
+  const totalWidth = Math.round(bossX + 220);
+
+  canvas.width = totalWidth;
+  canvas.height = 380;
+  canvas.style.width = totalWidth+'px';
+  canvas.style.height = '380px';
+
+  const npcs = [];
+  zoneLayout.forEach(zl=>{
+    const n = zl.topics.length;
+    zl.topics.forEach((key,i)=>{
+      const realm = REALMS.find(r=>r.key===key);
+      const slotW = zl.width/(n+1);
+      npcs.push({
+        key, name:realm.name, icon:realm.icon, color:realm.color,
+        x: zl.x0 + slotW*(i+1), y: 246 + (i%2===0? -8:12),
+      });
+    });
+  });
+  npcs.push({key:'boss', name:'El Profesor Tinta', icon:'🖋️', color:'#8E1B2B', x:bossX, y:244, isBoss:true});
+
+  worldLoopId += 1;
+  const myLoopId = worldLoopId;
+  world = {
+    canvas, ctx, npcs, zoneLayout, totalWidth,
+    player:{x:40, y:280, tx:40, ty:280},
+    nearNpc:null,
+  };
+
+  const canvasClone = canvas.cloneNode(true);
+  canvas.parentNode.replaceChild(canvasClone, canvas);
+  world.canvas = canvasClone;
+  world.ctx = canvasClone.getContext('2d');
+  wireWorldInput(myLoopId);
+
+  requestAnimationFrame(function tick(){ worldLoop(myLoopId, tick); });
+}
+
+function wireWorldInput(myLoopId){
+  const canvas = world.canvas;
+  canvas.addEventListener('click', e=>{
+    if(myLoopId !== worldLoopId || !world) return;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width/rect.width, scaleY = canvas.height/rect.height;
+    const cx = (e.clientX-rect.left)*scaleX, cy = (e.clientY-rect.top)*scaleY;
+    const hit = world.npcs.find(n=> Math.hypot(n.x-cx, n.y-cy) < 34);
+    if(hit){ openWorldDialogue(hit); return; }
+    world.player.tx = Math.max(20, Math.min(world.totalWidth-20, cx));
+    world.player.ty = Math.max(226, Math.min(340, cy));
+  });
+}
+
+function worldLoop(id, tick){
+  if(id !== worldLoopId) return;
+  requestAnimationFrame(tick);
+  if(!world || screens.world.hidden || $('#world-map-wrap').hidden) return;
+  updateWorld();
+  drawWorld();
+}
+
+function updateWorld(){
+  const p = world.player;
+  const dx = p.tx-p.x, dy = p.ty-p.y;
+  const dist = Math.hypot(dx,dy);
+  const speed = 3.4;
+  if(dist > speed){ p.x += dx/dist*speed; p.y += dy/dist*speed; }
+  else { p.x = p.tx; p.y = p.ty; }
+
+  world.nearNpc = world.npcs.find(n=> Math.hypot(n.x-p.x, n.y-p.y) < 46) || null;
+
+  const sc = $('#world-scroll');
+  const targetScroll = p.x - sc.clientWidth/2;
+  sc.scrollLeft = Math.max(0, Math.min(world.totalWidth-sc.clientWidth, targetScroll));
+}
+
+function drawWorld(){
+  const {ctx, canvas} = world;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  world.zoneLayout.forEach(zl=>{
+    ctx.fillStyle = ZONE_GROUND[zl.zone];
+    ctx.fillRect(zl.x0, 0, zl.width, canvas.height);
+    if(zl.zone === 'campo'){
+      for(let i=30; i<zl.width; i+=95) drawTree(ctx, zl.x0+i, 185);
+    } else if(zl.zone === 'pueblo'){
+      for(let i=40; i<zl.width; i+=150) drawHouse(ctx, zl.x0+i, 140);
+    } else {
+      for(let i=20; i<zl.width; i+=110) drawBuilding(ctx, zl.x0+i, 55, 72, 175);
+    }
+  });
+  ctx.fillStyle = '#3A2A22';
+  ctx.fillRect(world.totalWidth-220, 0, 220, canvas.height);
+
+  ctx.fillStyle = 'rgba(90,65,40,.55)';
+  ctx.fillRect(0, 300, world.totalWidth, 46);
+
+  world.npcs.forEach(n=> drawNpc(ctx, n, n===world.nearNpc));
+  drawPlayer(ctx, world.player);
+
+  if(world.nearNpc){
+    ctx.save();
+    ctx.font='bold 15px Nunito, sans-serif'; ctx.textAlign='center';
+    ctx.fillStyle='#241A10';
+    ctx.fillText('👆 Toca para hablar', world.player.x, world.player.y-42);
+    ctx.restore();
+  }
+}
+
+function openWorldDialogue(npc){
+  sfx.click();
+  const realm = REALMS.find(r=>r.key===npc.key);
+  const overlay2 = document.createElement('div');
+  overlay2.className = 'overlay';
+  overlay2.innerHTML = `
+    <div class="card result-card">
+      <div class="hero-badge" style="font-size:40px;">${npc.icon}</div>
+      <h2 class="title-xl" style="font-size:20px;">${npc.name}</h2>
+      <p class="subtitle">${npc.isBoss? '¡Enfréntate al reto final mixto!' : (realm? realm.desc : '')}</p>
+      <div style="display:flex; gap:10px; margin-top:14px;">
+        <button class="btn btn-ghost btn-block" id="world-dlg-close">Seguir explorando</button>
+        <button class="btn btn-primary btn-block" id="world-dlg-start">Comenzar reto</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay2);
+  $('#world-dlg-close').onclick = ()=> overlay2.remove();
+  $('#world-dlg-start').onclick = ()=>{
+    overlay2.remove();
+    quizReturnScreen = 'world';
+    if(npc.isBoss) startBoss(); else openRealm(npc.key);
+  };
 }
 
 /* ---------------- Online: código de equipo (PeerJS, sin backend propio) ---------------- */
@@ -1406,7 +1659,7 @@ function bootUI(){
   initWelcome();
   initTabbar();
   initOnlineScreen();
-  initCoachScreen();
+  initWorldScreen();
   initHeroStage();
   renderHud();
   if(state.started){ renderMap(); showScreen('map'); }

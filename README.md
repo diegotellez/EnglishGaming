@@ -6,14 +6,16 @@ directo en el navegador o se publica en GitHub Pages en un click. El menú
 y toda la navegación están en español; las preguntas quedan en inglés
 porque son el contenido que se está enseñando.
 
-La app tiene cuatro apartados, accesibles desde la barra inferior:
+La app tiene cinco apartados, accesibles desde la barra inferior:
 
 - **🎬 Temas** — cada tema gramatical es su propia tarjeta independiente,
   **todos jugables desde el principio** (sin desbloqueo progresivo).
+- **🗺️ Mundo** — un mapa 2D explorable (campo, pueblo y ciudad) con un
+  personaje por cada tema elegido (ver más abajo).
 - **🌐 Online** — jugar en equipo con un código, en tiempo real.
 - **🎩 Tienda** — gastar las monedas ganadas en personalizar al héroe.
-- **🧠 Coach** — un panel que analiza tus respuestas reales y una guía de
-  dudas de inglés (ver más abajo).
+- **🧠 Coach** — panel de resultados reales (rendimiento por tema y
+  últimos errores).
 
 ## El look: cartoon vintage de los años 30
 
@@ -35,6 +37,19 @@ Nota: esto es un homenaje **al estilo** de animación de los años 30 (el
 mismo que usa el videojuego Cuphead), construido desde cero para este
 proyecto con nombres e ilustraciones originales — no reproduce ningún
 personaje, logo ni marca de Cuphead, que son propiedad de Studio MDHR.
+Se pidió que los personajes se vieran exactamente como los de una
+referencia (tarjetas de personajes con avión/vehículo tipo "aviator
+card"); mantuve el mismo lenguaje visual (contorno grueso, guantes
+blancos, vehículo/prop junto al personaje) pero con diseños propios, no
+copias de esa ilustración específica — que también parece pertenecer a
+otro estudio, con sus propios derechos.
+
+## Logo
+
+`GrammarQuest` tiene un logo propio (insignia con rueda de colores
+alternados arriba + nombre en dos tonos abajo) entregado como imagen
+aparte — no forma parte todavía de las pantallas del juego. Si te gusta,
+dime y lo integro en la pantalla de bienvenida.
 
 ## Temas cubiertos (apartado "Temas")
 
@@ -51,32 +66,51 @@ del espectáculo:
 
 ## Coach (apartado "Coach")
 
-Un panel de rendimiento que usa los datos reales de cada partida (no una
-IA generativa — más detalle abajo):
+Panel de **resultados**, sin buscador ni chat — solo datos reales de
+cada partida:
 
 - **Rendimiento por tema**: barra de % de aciertos por cada uno de los 6
   temas, calculada sobre todas las preguntas respondidas (quiz individual,
-  memoria de irregulares, batalla final y reto Online).
+  memoria de irregulares, batalla final, reto Online y Mundo).
 - **Recomendación**: cuando hay suficientes datos (3+ respuestas en un
   tema), señala el tema más débil con un consejo corto y un botón para
   practicarlo directamente.
 - **Últimos errores**: las últimas preguntas falladas, con tu respuesta y
   la respuesta correcta lado a lado.
-- **Pregúntale a tu Coach**: un buscador que responde dudas de inglés
-  (tiempos verbales, voz pasiva, adjetivos, artículos, preposiciones de
-  tiempo, pronombres, etc.) usando una guía de ~20 consejos ya escritos.
 
-**Importante — qué es y qué no es esta "IA":** no está conectado a
-ningún modelo de lenguaje ni a internet. El "rendimiento" es 100% datos
-reales de tus respuestas; la "ayuda" es una búsqueda por palabras clave
-sobre una guía fija (`FAQ_TIPS` en `game.js`). Esto es deliberado: para
-un chat de inglés realmente abierto (que entienda cualquier pregunta)
-haría falta conectar una IA real (por ejemplo la API de Claude), lo cual
-requiere un servidor propio que guarde la clave de API de forma segura —
-nunca debe ponerse una clave de API directamente en el código de una
-página web pública, porque cualquiera podría copiarla y usarla. Ese
-backend no está incluido en este proyecto estático; si más adelante
-quieres ese chat "de verdad", es la siguiente pieza a construir aparte.
+Estos mismos datos (cuántas preguntas respondiste por tema) son los que
+usa el apartado **Mundo** para sugerir qué temas construir en el mapa.
+
+## Mundo (apartado "Mundo")
+
+Un mapa 2D explorable, en el mismo estilo cartoon vintage:
+
+1. Eliges **al menos 5 de los 6 temas** (se sugieren los que más
+   practicas, según los datos reales del Coach). Cuantos más elijas, más
+   grande es el mapa.
+2. Se genera un mundo con tres zonas de izquierda a derecha — **Campo**,
+   **Pueblo** y **Ciudad** — cada tema tiene un personaje/parada propia en
+   una de las zonas, y al final del mapa siempre está la torre de **El
+   Profesor Tinta** (el jefe final).
+3. Caminas tocando el mapa (tu personaje se mueve hacia donde tocas; la
+   cámara te sigue). Al acercarte a un personaje, tocarlo abre un diálogo
+   con el botón **"Comenzar reto"**, que lanza el mismo quiz (o el memory,
+   para verbos irregulares) que en el apartado Temas — es el mismo motor
+   de juego, solo con otra forma de llegar a él.
+
+## Sobre el pedido de un chat con IA (Gemini)
+
+Se pidió un chat con una IA real (tipo Gemini) dentro de "Temas". No lo
+construí todavía porque requiere una decisión que solo tú puedes tomar:
+conectar una IA real necesita una **clave de API** y, más importante, un
+**servidor propio** que la guarde — nunca se debe poner una clave de API
+directamente en el código de una página web pública (como esta, en
+GitHub Pages), porque cualquiera que abra el código fuente podría
+copiarla y usarla a tu costa. Sin ese backend no hay forma segura de
+ofrecer un chat con Gemini/Claude/ChatGPT desde este proyecto tal como
+está (HTML+JS estático, sin servidor). Es la pieza pendiente — dime si
+tienes o puedes conseguir una clave de API y dónde alojarías ese
+backend, y lo construimos aparte.
 
 ## Modo Online (apartado "Online")
 
@@ -185,10 +219,10 @@ artículo es `{id, icon, name, price}` — `price: 0` lo deja gratis desde
 el principio (los personajes iniciales funcionan así). El color del
 cuerpo del personaje 2D para cada `id` de personaje está en `CHAR_TINTS`.
 
-## Personalizar la guía del Coach
+## Personalizar los consejos del Coach
 
-Los consejos que aparecen al recomendar un tema están en `TOPIC_TIPS`
-(uno por tema). La guía de búsqueda de dudas está en `FAQ_TIPS`: un
-arreglo de `{id, title, keywords, body}` — agrega tantas entradas como
-quieras, con las palabras clave en español que un estudiante podría
-escribir.
+El consejo que aparece al recomendar un tema está en `TOPIC_TIPS` (uno
+por tema) en `game.js`. También queda ahí `FAQ_TIPS`, una guía más
+amplia de ~20 dudas comunes de inglés (sin usarse en la interfaz por
+ahora) por si más adelante se conecta una IA real y sirve como base de
+respaldo.
