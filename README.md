@@ -6,28 +6,37 @@ directo en el navegador o se publica en GitHub Pages en un click. El menú
 y toda la navegación están en español; las preguntas quedan en inglés
 porque son el contenido que se está enseñando.
 
-La app tiene tres apartados, accesibles desde la barra inferior:
+La app tiene cuatro apartados, accesibles desde la barra inferior:
 
-- **🗺️ Temas** — cada tema gramatical es su propia tarjeta independiente
-  (modo individual).
+- **🗺️ Temas** — cada tema gramatical es su propia tarjeta independiente,
+  **todos jugables desde el principio** (sin desbloqueo progresivo).
 - **🌐 Online** — jugar en equipo con un código, en tiempo real.
 - **🎒 Tienda** — gastar las monedas ganadas en personalizar al héroe.
+- **🧠 Coach** — un panel que analiza tus respuestas reales y una guía de
+  dudas de inglés (ver más abajo).
 
-## El personaje en 3D
+## El personaje en 2D, estilo cartoon vintage
 
-Arriba de "Temas" y de "Tienda" hay un escenario 3D (con
-[Three.js](https://threejs.org/)) donde el héroe gira sobre una
-plataforma mostrando lo que tiene equipado: sombrero, vehículo y comida
-aparecen junto a él en la escena. Se puede arrastrar con el dedo/mouse
-para girarlo. Al comprar o equipar algo nuevo en la Tienda, el cambio se
-ve ahí mismo al instante.
+Arriba de "Temas" y de "Tienda" hay una ilustración del héroe dibujada en
+SVG con estética "rubber-hose" (los dibujos animados de los años 30:
+contornos negros gruesos, guantes blancos, fondo crema con viñeta). La
+cara del personaje es el emoji que elegiste; el sombrero, el vehículo y
+la comida que tengas equipados aparecen como accesorios junto a él, y el
+color del cuerpo cambia según el personaje elegido en la Tienda. Tiene
+una animación de rebote constante y salta si le haces click/tap.
 
-Si el navegador no soporta WebGL o la librería no llega a cargar (por
-ejemplo, por un firewall muy restrictivo), el escenario cae de forma
-automática a una versión plana (el avatar y sus accesorios como emoji
-grandes) — el juego sigue funcionando igual, solo sin el giro 3D.
+Nota: esto es un homenaje **al estilo** de animación de los años 30 (el
+mismo que usa el videojuego Cuphead), dibujado desde cero para este
+proyecto — no reproduce el personaje ni la marca de Cuphead, que son
+propiedad de Studio MDHR.
+
+No depende de ninguna librería externa (es SVG + CSS puro), así que
+siempre funciona, incluso sin conexión, y es mucho más liviano que un
+motor 3D.
 
 ## Temas cubiertos (apartado "Temas")
+
+Todos disponibles desde el principio:
 
 - **Aldea del Presente** — Present Simple & Present Continuous
 - **Ruinas del Pasado** — Past Simple & Past Continuous
@@ -35,8 +44,36 @@ grandes) — el juego sigue funcionando igual, solo sin el giro 3D.
 - **Jardín de Adjetivos** — Comparativos, superlativos y orden de adjetivos
 - **Forja Regular** — Verbos regulares y reglas de ortografía del `-ed`
 - **Cuevas Irregulares** — Verbos irregulares, como minijuego de memoria (memory match)
-- **El Dragón Gramatical** — Batalla final: reto mixto de todos los temas, se
-  desbloquea al ganar al menos ⭐ en cada reino
+- **El Dragón Gramatical** — Batalla final: reto mixto de todos los temas
+
+## Coach (apartado "Coach")
+
+Un panel de rendimiento que usa los datos reales de cada partida (no una
+IA generativa — más detalle abajo):
+
+- **Rendimiento por tema**: barra de % de aciertos por cada uno de los 6
+  temas, calculada sobre todas las preguntas respondidas (quiz individual,
+  memoria de irregulares, batalla final y reto Online).
+- **Recomendación**: cuando hay suficientes datos (3+ respuestas en un
+  tema), señala el tema más débil con un consejo corto y un botón para
+  practicarlo directamente.
+- **Últimos errores**: las últimas preguntas falladas, con tu respuesta y
+  la respuesta correcta lado a lado.
+- **Pregúntale a tu Coach**: un buscador que responde dudas de inglés
+  (tiempos verbales, voz pasiva, adjetivos, artículos, preposiciones de
+  tiempo, pronombres, etc.) usando una guía de ~20 consejos ya escritos.
+
+**Importante — qué es y qué no es esta "IA":** no está conectado a
+ningún modelo de lenguaje ni a internet. El "rendimiento" es 100% datos
+reales de tus respuestas; la "ayuda" es una búsqueda por palabras clave
+sobre una guía fija (`FAQ_TIPS` en `game.js`). Esto es deliberado: para
+un chat de inglés realmente abierto (que entienda cualquier pregunta)
+haría falta conectar una IA real (por ejemplo la API de Claude), lo cual
+requiere un servidor propio que guarde la clave de API de forma segura —
+nunca debe ponerse una clave de API directamente en el código de una
+página web pública, porque cualquiera podría copiarla y usarla. Ese
+backend no está incluido en este proyecto estático; si más adelante
+quieres ese chat "de verdad", es la siguiente pieza a construir aparte.
 
 ## Modo Online (apartado "Online")
 
@@ -86,7 +123,8 @@ solo decorativa.
 
 ## Mecánicas de juego
 
-- Mapa tipo "camino de aventura" con reinos que se van desbloqueando.
+- Cada tema es una tarjeta independiente, todas disponibles desde el
+  inicio (sin desbloqueo progresivo).
 - Preguntas de opción múltiple con temporizador, corazones (vidas) y racha
   con bonus de XP.
 - Sistema de nivel, experiencia (XP) y monedas, guardado en `localStorage`
@@ -141,4 +179,13 @@ variedad.
 Los artículos de la tienda viven en `game.js`, en el objeto `SHOP`
 (categorías `personajes`, `sombreros`, `vehiculos`, `comida`). Cada
 artículo es `{id, icon, name, price}` — `price: 0` lo deja gratis desde
-el principio (los personajes iniciales funcionan así).
+el principio (los personajes iniciales funcionan así). El color del
+cuerpo del personaje 2D para cada `id` de personaje está en `CHAR_TINTS`.
+
+## Personalizar la guía del Coach
+
+Los consejos que aparecen al recomendar un tema están en `TOPIC_TIPS`
+(uno por tema). La guía de búsqueda de dudas está en `FAQ_TIPS`: un
+arreglo de `{id, title, keywords, body}` — agrega tantas entradas como
+quieras, con las palabras clave en español que un estudiante podría
+escribir.

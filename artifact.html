@@ -15,12 +15,8 @@
   </header>
 
   <div id="hero-stage" class="hero-stage" hidden>
-    <canvas id="hero-canvas"></canvas>
-    <div class="hero-fallback" id="hero-fallback" hidden>
-      <div class="hero-fallback-avatar" id="hero-fallback-avatar">🧙‍♀️</div>
-      <div class="hero-fallback-gear" id="hero-fallback-gear"></div>
-    </div>
-    <div class="hero-caption">👆 Arrastra para girar a tu personaje</div>
+    <div class="hero-scene" id="hero-scene"></div>
+    <div class="hero-caption">✨ Toca a tu personaje</div>
   </div>
 
   <main>
@@ -99,6 +95,35 @@
       <div class="shop-grid" id="shop-grid"></div>
     </section>
 
+    <!-- COACH -->
+    <section id="screen-coach" class="screen" hidden>
+      <div class="eyebrow" style="text-align:center;">Coach</div>
+      <h2 class="title-xl" style="font-size:22px; text-align:center;">Tu entrenador de inglés</h2>
+      <p class="subtitle">Analiza tus respuestas reales para mostrarte en qué necesitas practicar más, y te ayuda a resolver dudas rápidas de inglés.</p>
+
+      <div class="card">
+        <div class="eyebrow">Tu rendimiento por tema</div>
+        <div id="coach-stats"></div>
+      </div>
+
+      <div id="coach-insight"></div>
+
+      <div class="card">
+        <div class="eyebrow">Tus últimos errores</div>
+        <div id="coach-mistakes"></div>
+      </div>
+
+      <div class="card">
+        <div class="eyebrow">Pregúntale a tu Coach</div>
+        <div class="coach-search-row">
+          <input class="text-input" id="coach-search-input" placeholder="Ej: cuándo uso &quot;did&quot;, orden de adjetivos...">
+          <button class="btn btn-primary" id="coach-search-btn">Buscar</button>
+        </div>
+        <div id="coach-search-results"></div>
+        <p class="footer-note" style="text-align:left; margin-top:8px;">Este Coach busca en una guía de consejos preparada de antemano — no es una IA conectada a internet, así que funciona siempre, incluso sin conexión.</p>
+      </div>
+    </section>
+
     <!-- ONLINE -->
     <section id="screen-online" class="screen" hidden>
       <div class="eyebrow" style="text-align:center;">Online</div>
@@ -147,10 +172,10 @@
     <button class="tab-btn active" data-tab="map"><span class="tab-ic">🗺️</span>Temas</button>
     <button class="tab-btn" data-tab="online"><span class="tab-ic">🌐</span>Online</button>
     <button class="tab-btn" data-tab="shop"><span class="tab-ic">🎒</span>Tienda</button>
+    <button class="tab-btn" data-tab="coach"><span class="tab-ic">🧠</span>Coach</button>
   </nav>
 
   <p class="footer-note">Hecho para estudiantes de Octavo · GrammarQuest</p>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.2/dist/peerjs.min.js"></script>
 <script src="game.js"></script>

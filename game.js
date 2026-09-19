@@ -198,11 +198,89 @@ const SHOP_TABS = [
   {key:'comida', label:'Comida', icon:'🍕'},
 ];
 
+/* ---------------- Coach: consejos por tema y guía de dudas ---------------- */
+
+const TOPIC_TIPS = {
+  present: 'Usa el presente simple para hábitos y rutinas (I play, she plays — no olvides la -s en la 3ª persona). Usa el presente continuo (am/is/are + -ing) para algo que pasa justo ahora: "She is playing right now".',
+  past: 'El pasado simple describe una acción terminada (I visited, she went). El pasado continuo (was/were + -ing) describe una acción en progreso interrumpida por otra: "I was walking when it started to rain".',
+  passive: 'La voz pasiva se forma con be + participio pasado, y el objeto de la acción pasa a ser el sujeto: "Cats chase mice" → "Mice are chased by cats". En pasado usa was/were + participio.',
+  adjectives: 'Adjetivos cortos: añade -er/-est (tall→taller→the tallest). Adjetivos largos: usa more/the most (interesting→more interesting). El orden es: opinión, tamaño, edad, forma, color, origen, material.',
+  regular: 'Se forma agregando -ed (walk→walked). Si termina en "e", solo agrega -d (like→liked). Si termina en consonante+y, cambia a -ied (study→studied). Si es una sílaba corta (CVC), duplica la consonante (stop→stopped).',
+  irregular: 'No siguen una regla fija — hay que memorizarlos de a poco. Algunos muy comunes: go→went, see→saw, eat→ate, have→had, take→took, buy→bought. Practica con el minijuego de memoria de las Cuevas Irregulares.',
+};
+
+const FAQ_TIPS = [
+  {id:'present-simple', title:'Presente simple', keywords:['presente simple','present simple','rutina','habito','hábito','siempre','every day'],
+    body:'Se usa para hábitos, rutinas y hechos generales: "I play football every Sunday." En 3ª persona (he/she/it) se agrega -s: "She plays football."'},
+  {id:'present-continuous', title:'Presente continuo', keywords:['presente continuo','present continuous','-ing','ahora mismo','right now'],
+    body:'Se usa para algo que está pasando en este momento: am/is/are + verbo-ing. "I am studying right now." "They are having dinner."'},
+  {id:'past-simple', title:'Pasado simple', keywords:['pasado simple','past simple','ayer','yesterday'],
+    body:'Describe una acción terminada en el pasado. Regulares: verbo + -ed (walked). Irregulares tienen su propia forma (went, saw, ate). Negativo: didn\'t + verbo base.'},
+  {id:'past-continuous', title:'Pasado continuo', keywords:['pasado continuo','past continuous','was were ing'],
+    body:'Describe una acción en progreso en el pasado, muchas veces interrumpida por otra: was/were + verbo-ing. "I was walking home when it started to rain."'},
+  {id:'passive-voice', title:'Voz pasiva', keywords:['voz pasiva','passive voice','pasiva','by'],
+    body:'El objeto de la acción se convierte en sujeto: be + participio pasado. "Shakespeare wrote Hamlet" → "Hamlet was written by Shakespeare."'},
+  {id:'comparatives', title:'Comparativos', keywords:['comparativo','comparative','er than','more than','mas que'],
+    body:'Adjetivos cortos: -er + than (taller than). Adjetivos largos: more + than (more interesting than). Irregulares: good→better, bad→worse.'},
+  {id:'superlatives', title:'Superlativos', keywords:['superlativo','superlative','the est','the most'],
+    body:'Adjetivos cortos: the + -est (the tallest). Adjetivos largos: the most + adjetivo (the most expensive). Irregulares: good→the best, bad→the worst.'},
+  {id:'adj-order', title:'Orden de los adjetivos', keywords:['orden de adjetivos','adjective order'],
+    body:'El orden habitual es: opinión, tamaño, edad, forma, color, origen, material + sustantivo. Ejemplo: "a beautiful old wooden house."'},
+  {id:'regular-verbs', title:'Verbos regulares', keywords:['verbos regulares','regular verbs','-ed'],
+    body:'Se forman agregando -ed: walk→walked. Si termina en "e": +d (like→liked). Consonante+y → -ied (study→studied). Sílaba corta CVC: duplica consonante (stop→stopped).'},
+  {id:'irregular-verbs', title:'Verbos irregulares', keywords:['verbos irregulares','irregular verbs'],
+    body:'No siguen una regla — se memorizan. Muy comunes: go→went, see→saw, have→had, take→took, buy→bought, think→thought.'},
+  {id:'do-does', title:'¿Do o Does?', keywords:['do does','do vs does','auxiliar presente'],
+    body:'Usa "does" con he/she/it en presente ("Does she like pizza?") y "do" con el resto (I/you/we/they). El verbo principal queda en forma base.'},
+  {id:'did', title:'¿Cuándo uso Did?', keywords:['did','pasado preguntas','pasado negativo'],
+    body:'"Did" se usa para preguntas y negaciones en pasado simple, con cualquier sujeto: "Did you finish?" "She didn\'t go." El verbo principal vuelve a su forma base.'},
+  {id:'articles', title:'Artículos: a, an, the', keywords:['articulo','artículo','a an the','articles'],
+    body:'"A" antes de sonido consonante (a car), "an" antes de sonido vocal (an apple). "The" cuando ya sabemos de qué/quién hablamos.'},
+  {id:'prep-time', title:'Preposiciones de tiempo: in / on / at', keywords:['preposiciones de tiempo','in on at','prepositions time'],
+    body:'"In" con meses/años/estaciones (in July). "On" con días y fechas (on Monday). "At" con horas exactas (at 7 p.m.).'},
+  {id:'plurals', title:'Plurales en inglés', keywords:['plural','plurales','plurals'],
+    body:'La mayoría agrega -s (cat→cats). Termina en s/x/ch/sh: agrega -es (box→boxes). Consonante+y: -ies (city→cities). Hay irregulares: child→children, foot→feet.'},
+  {id:'pronouns', title:'Pronombres sujeto y objeto', keywords:['pronombres','subject object pronouns','he him she her'],
+    body:'Sujeto: I, you, he, she, it, we, they. Objeto: me, you, him, her, it, us, them. "She likes him" (ella = sujeto, él = objeto).'},
+  {id:'there-is-are', title:'There is / There are', keywords:['there is there are','hay'],
+    body:'"There is" con singular ("There is a book on the table"). "There are" con plural ("There are three books").'},
+  {id:'some-any', title:'Some vs Any', keywords:['some any','some vs any'],
+    body:'"Some" en oraciones afirmativas ("I have some money"). "Any" en negativas y preguntas ("I don\'t have any money", "Do you have any money?").'},
+  {id:'will-going-to', title:'Futuro: will vs going to', keywords:['will going to','futuro','future'],
+    body:'"Going to" para planes ya decididos ("I\'m going to study tonight"). "Will" para decisiones espontáneas o predicciones ("I think it will rain").'},
+  {id:'much-many', title:'Much vs Many', keywords:['mucho poco','much many'],
+    body:'"Many" con sustantivos contables ("many books"). "Much" con sustantivos incontables ("much water"). En afirmativas también se usa "a lot of" para ambos.'},
+];
+
+function matchFAQ(query){
+  const q = (query||'').toLowerCase().trim();
+  if(!q) return [];
+  const words = q.split(/\s+/).filter(w=>w.length>2);
+  const scored = FAQ_TIPS.map(tip=>{
+    let score = 0;
+    const title = tip.title.toLowerCase(), body = tip.body.toLowerCase();
+    tip.keywords.forEach(k=>{ if(q.includes(k) || k.includes(q)) score += 3; });
+    if(title.includes(q)) score += 3;
+    words.forEach(w=>{
+      tip.keywords.forEach(k=>{ if(k.includes(w)) score += 1; });
+      if(title.includes(w)) score += 1;
+      if(body.includes(w)) score += 0.5;
+    });
+    return {tip, score};
+  }).filter(x=>x.score>0).sort((a,b)=>b.score-a.score);
+  return scored.slice(0,3).map(x=>x.tip);
+}
+
 /* ---------------- estado / guardado ---------------- */
 
 const SAVE_KEY = 'grammarquest_save_v2';
 const AVATARS = SHOP.personajes.filter(p=>p.price===0).map(p=>p.icon);
 
+function defaultStatsByTopic(){
+  const st = {};
+  REALMS.forEach(r=>{ st[r.key] = {attempts:0, correct:0}; });
+  return st;
+}
 function defaultState(){
   return {
     name:'', avatar:AVATARS[0], level:1, xp:0, coins:0,
@@ -210,6 +288,7 @@ function defaultState(){
     bossCleared:false, muted:false, started:false,
     inventory:{personajes:[], sombreros:[], vehiculos:[], comida:[]},
     equipped:{personaje:null, sombreros:null, vehiculos:null, comida:null},
+    stats:{byTopic: defaultStatsByTopic(), recentMistakes:[]},
   };
 }
 
@@ -222,6 +301,9 @@ function loadState(){
     merged.inventory = Object.assign(defaultState().inventory, parsed.inventory||{});
     merged.equipped = Object.assign(defaultState().equipped, parsed.equipped||{});
     merged.stars = Object.assign(defaultState().stars, parsed.stars||{});
+    merged.stats = Object.assign(defaultState().stats, parsed.stats||{});
+    merged.stats.byTopic = Object.assign(defaultStatsByTopic(), (parsed.stats||{}).byTopic||{});
+    merged.stats.recentMistakes = (parsed.stats||{}).recentMistakes || [];
     return merged;
   }catch(e){ return defaultState(); }
 }
@@ -229,6 +311,21 @@ function saveState(){
   try{ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }catch(e){ /* modo privado, etc */ }
 }
 let state = loadState();
+
+function ensureTopicStats(key){
+  if(!state.stats.byTopic[key]) state.stats.byTopic[key] = {attempts:0, correct:0};
+  return state.stats.byTopic[key];
+}
+function recordAnswer(topicKey, wasCorrect, detail){
+  const st = ensureTopicStats(topicKey);
+  st.attempts += 1;
+  if(wasCorrect){ st.correct += 1; }
+  else if(detail){
+    state.stats.recentMistakes.unshift(Object.assign({topic:topicKey, ts:Date.now()}, detail));
+    state.stats.recentMistakes = state.stats.recentMistakes.slice(0, 12);
+  }
+  saveState();
+}
 
 function isOwned(cat, item){ return item.price===0 || state.inventory[cat].includes(item.id); }
 function equippedItem(cat){
@@ -342,6 +439,7 @@ const screens = {
   memory: $('#screen-memory'),
   shop: $('#screen-shop'),
   online: $('#screen-online'),
+  coach: $('#screen-coach'),
 };
 let overlay = null;
 
@@ -367,143 +465,78 @@ function renderHud(){
   $('#hud-mute').textContent = state.muted ? '🔇' : '🔊';
 }
 
-/* ---------------- escenario 3D del personaje ---------------- */
-let three = null;
+/* ---------------- personaje 2D estilo cartoon vintage ---------------- */
 const heroStageEl = $('#hero-stage');
+let heroJumpTimer = null;
 
-function webglSupported(){
-  try{
-    const c = document.createElement('canvas');
-    return !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl')));
-  }catch(e){ return false; }
+const CHAR_TINTS = {
+  wizard:'#9B6BFF', hero:'#FF6B8B', ninja:'#4B4B5A', elf:'#33E4C2',
+  vampire:'#8E2A52', villain:'#5B3AA0', fairy:'#FFB3DE', dragonhero:'#2ECC71',
+  unicorn:'#FF9ED2', robot:'#9AA5B1', genie:'#4FD1C5', dino:'#52C41A',
+  zombie:'#7CB518', wolf:'#6B7280', alien:'#34D399', king:'#FFC857',
+};
+function currentCharTint(){
+  const item = SHOP.personajes.find(p=>p.icon===state.avatar);
+  return (item && CHAR_TINTS[item.id]) || '#FFD9A0';
 }
+function escXml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
-function makeEmojiTexture(emoji, size){
-  size = size || 128;
-  const c = document.createElement('canvas'); c.width = c.height = size;
-  const cx = c.getContext('2d');
-  cx.clearRect(0,0,size,size);
-  cx.font = Math.floor(size*0.75)+'px "Segoe UI Emoji","Noto Color Emoji",system-ui,sans-serif';
-  cx.textAlign = 'center'; cx.textBaseline = 'middle';
-  cx.fillText(emoji, size/2, size/2 + size*0.05);
-  const tex = new THREE.CanvasTexture(c);
-  tex.needsUpdate = true;
-  return tex;
+function buildHeroSVG(){
+  const tint = currentCharTint();
+  const hat = equippedItem('sombreros');
+  const veh = equippedItem('vehiculos');
+  const food = equippedItem('comida');
+  return `<svg viewBox="0 -16 260 236" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tu personaje">
+    <defs>
+      <radialGradient id="hero-vg" cx="50%" cy="34%" r="75%">
+        <stop offset="55%" stop-color="#000" stop-opacity="0"/>
+        <stop offset="100%" stop-color="#3a2410" stop-opacity=".4"/>
+      </radialGradient>
+    </defs>
+    <rect x="0" y="-16" width="260" height="236" fill="#F6E9CF"/>
+    <ellipse cx="130" cy="204" rx="52" ry="9" fill="#000" opacity=".16"/>
+    ${veh ? `<text x="210" y="186" font-size="34" text-anchor="middle" dominant-baseline="central">${escXml(veh.icon)}</text>` : ''}
+    <g id="charGroup">
+      <rect x="112" y="163" width="13" height="36" rx="6.5" fill="${tint}" stroke="#1a1410" stroke-width="4"/>
+      <rect x="135" y="163" width="13" height="36" rx="6.5" fill="${tint}" stroke="#1a1410" stroke-width="4"/>
+      <ellipse cx="118" cy="200" rx="13" ry="7" fill="#1a1410"/>
+      <ellipse cx="142" cy="200" rx="13" ry="7" fill="#1a1410"/>
+      <path d="M98,128 C78,132 66,142 62,152" fill="none" stroke="#1a1410" stroke-width="15" stroke-linecap="round"/>
+      <path d="M98,128 C78,132 66,142 62,152" fill="none" stroke="${tint}" stroke-width="9" stroke-linecap="round"/>
+      <path d="M162,128 C182,132 194,142 198,152" fill="none" stroke="#1a1410" stroke-width="15" stroke-linecap="round"/>
+      <path d="M162,128 C182,132 194,142 198,152" fill="none" stroke="${tint}" stroke-width="9" stroke-linecap="round"/>
+      <circle cx="60" cy="156" r="15" fill="#FFF7E8" stroke="#1a1410" stroke-width="4"/>
+      <line x1="52" y1="162" x2="57" y2="167" stroke="#1a1410" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="60" y1="164" x2="60" y2="170" stroke="#1a1410" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="200" cy="156" r="15" fill="#FFF7E8" stroke="#1a1410" stroke-width="4"/>
+      <line x1="205" y1="162" x2="200" y2="167" stroke="#1a1410" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="200" y1="164" x2="200" y2="170" stroke="#1a1410" stroke-width="2.5" stroke-linecap="round"/>
+      ${food ? `<text x="203" y="140" font-size="26" text-anchor="middle" dominant-baseline="central">${escXml(food.icon)}</text>` : ''}
+      <ellipse cx="130" cy="140" rx="40" ry="46" fill="${tint}" stroke="#1a1410" stroke-width="5"/>
+      <path d="M118,116 L130,128 L142,116 L136,109 L124,109 Z" fill="#E63946" stroke="#1a1410" stroke-width="3"/>
+      <circle cx="130" cy="76" r="47" fill="#FFF7E8" stroke="#1a1410" stroke-width="5"/>
+      <text x="130" y="80" font-size="54" text-anchor="middle" dominant-baseline="central">${escXml(state.avatar)}</text>
+      ${hat ? `<text x="130" y="36" font-size="40" text-anchor="middle" dominant-baseline="central" transform="rotate(-8 130 36)">${escXml(hat.icon)}</text>` : ''}
+    </g>
+    <rect x="0" y="-16" width="260" height="236" fill="url(#hero-vg)"/>
+  </svg>`;
 }
 
 function initHeroStage(){
-  const canvas = $('#hero-canvas');
-  if(typeof THREE === 'undefined' || !webglSupported()){
-    heroStageEl.classList.add('stage-fallback');
-    $('#hero-fallback').hidden = false;
-    return;
-  }
-  try{
-    const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
-    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio||1));
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 50);
-    camera.position.set(0, 1.35, 5.3);
-    camera.lookAt(0, 0.9, 0);
-
-    scene.add(new THREE.AmbientLight(0xffffff, 0.85));
-    const dir = new THREE.DirectionalLight(0xffffff, 0.9);
-    dir.position.set(2,4,3);
-    scene.add(dir);
-
-    const platform = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.5, 1.6, 0.18, 48),
-      new THREE.MeshStandardMaterial({color:0x7C4DFF, emissive:0x3a1f8f, emissiveIntensity:0.5, metalness:0.3, roughness:0.4})
-    );
-    platform.position.y = -0.75;
-    scene.add(platform);
-
-    const ring = new THREE.Mesh(
-      new THREE.TorusGeometry(1.62, 0.03, 8, 60),
-      new THREE.MeshBasicMaterial({color:0xFFC857})
-    );
-    ring.rotation.x = Math.PI/2; ring.position.y = -0.65;
-    scene.add(ring);
-
-    const group = new THREE.Group();
-    scene.add(group);
-
-    function billboard(size){
-      const spr = new THREE.Sprite(new THREE.SpriteMaterial({transparent:true}));
-      spr.scale.set(size,size,1);
-      return spr;
-    }
-    const avatarSprite = billboard(2.1); avatarSprite.position.set(0,0.55,0);
-    const hatSprite = billboard(1.0); hatSprite.position.set(0,1.7,0.05);
-    const vehicleSprite = billboard(1.4); vehicleSprite.position.set(1.2,-0.2,-0.25);
-    const foodSprite = billboard(0.65); foodSprite.position.set(-1.15,0.0,0.15);
-    group.add(avatarSprite, hatSprite, vehicleSprite, foodSprite);
-
-    three = {renderer, scene, camera, group, avatarSprite, hatSprite, vehicleSprite, foodSprite, dragging:false, lastX:0, rotY:0.5};
-
-    canvas.addEventListener('pointerdown', e=>{ three.dragging = true; three.lastX = e.clientX; canvas.setPointerCapture(e.pointerId); });
-    canvas.addEventListener('pointerup', ()=>{ three.dragging = false; });
-    canvas.addEventListener('pointercancel', ()=>{ three.dragging = false; });
-    canvas.addEventListener('pointermove', e=>{
-      if(!three.dragging) return;
-      const dx = e.clientX - three.lastX; three.lastX = e.clientX;
-      three.rotY += dx*0.012;
-    });
-
-    updateHeroStage();
-    resizeHeroStage();
-    requestAnimationFrame(animateHeroStage);
-  }catch(e){
-    three = null;
-    heroStageEl.classList.add('stage-fallback');
-    $('#hero-fallback').hidden = false;
-  }
+  const scene = $('#hero-scene');
+  scene.addEventListener('click', ()=>{
+    sfx.click();
+    scene.classList.remove('jump'); void scene.offsetWidth; scene.classList.add('jump');
+    clearTimeout(heroJumpTimer);
+    heroJumpTimer = setTimeout(()=> scene.classList.remove('jump'), 550);
+  });
+  updateHeroStage();
 }
-
-function resizeHeroStage(){
-  if(!three) return;
-  const canvas = three.renderer.domElement;
-  const w = canvas.clientWidth, h = canvas.clientHeight;
-  if(!w || !h) return;
-  three.renderer.setSize(w, h, false);
-  three.camera.aspect = w/h;
-  three.camera.updateProjectionMatrix();
-}
-addEventListener('resize', resizeHeroStage);
-
-function animateHeroStage(){
-  if(!three) return;
-  requestAnimationFrame(animateHeroStage);
-  if(heroStageEl.hidden) return;
-  if(!three.dragging && !reduceMotion){ three.rotY += 0.006; }
-  three.group.rotation.y = three.rotY;
-  three.renderer.render(three.scene, three.camera);
-}
-
 function updateHeroStage(){
-  $('#hero-fallback-avatar').textContent = state.avatar;
-  $('#hero-fallback-gear').textContent = gearIcons();
-  if(!three) return;
-  three.avatarSprite.material.map = makeEmojiTexture(state.avatar, 160);
-  three.avatarSprite.material.needsUpdate = true;
-
-  const hat = equippedItem('sombreros');
-  three.hatSprite.visible = !!hat;
-  if(hat){ three.hatSprite.material.map = makeEmojiTexture(hat.icon, 120); three.hatSprite.material.needsUpdate = true; }
-
-  const veh = equippedItem('vehiculos');
-  three.vehicleSprite.visible = !!veh;
-  if(veh){ three.vehicleSprite.material.map = makeEmojiTexture(veh.icon, 140); three.vehicleSprite.material.needsUpdate = true; }
-
-  const food = equippedItem('comida');
-  three.foodSprite.visible = !!food;
-  if(food){ three.foodSprite.material.map = makeEmojiTexture(food.icon, 100); three.foodSprite.material.needsUpdate = true; }
+  $('#hero-scene').innerHTML = buildHeroSVG();
 }
-
 function setHeroStageVisible(show){
   heroStageEl.hidden = !show;
-  if(show) requestAnimationFrame(resizeHeroStage);
 }
 
 /* ---------------- pantalla de bienvenida ---------------- */
@@ -544,6 +577,7 @@ function initTabbar(){
       if(tab === 'map'){ renderMap(); showScreen('map'); }
       else if(tab === 'shop'){ renderShop(); showScreen('shop'); }
       else if(tab === 'online'){ renderOnline(); showScreen('online'); }
+      else if(tab === 'coach'){ renderCoach(); showScreen('coach'); }
     };
   });
 }
@@ -560,32 +594,25 @@ function starsHtml(count){
 function renderMap(){
   const wrap = $('#map-path');
   wrap.innerHTML = '';
-  let prevDone = true;
   REALMS.forEach(r=>{
-    const unlocked = prevDone;
     const stars = state.stars[r.key]||0;
     const card = document.createElement('button');
-    card.className = 'mode-card'+(unlocked?'':' locked')+(stars>0?' done':'');
+    card.className = 'mode-card'+(stars>0?' done':'');
     card.style.setProperty('--mode-color', r.color);
-    if(!unlocked){ card.disabled = true; card.setAttribute('aria-disabled','true'); }
     card.innerHTML = `
-      <div class="mode-icon">${unlocked? r.icon : '🔒'}</div>
+      <div class="mode-icon">${r.icon}</div>
       <div class="mode-name">${r.name}</div>
       <div class="mode-desc">${r.desc}</div>
       <div class="realm-stars">${starsHtml(stars)}</div>`;
-    if(unlocked){ card.onclick = ()=>{ sfx.click(); openRealm(r.key); }; }
+    card.onclick = ()=>{ sfx.click(); openRealm(r.key); };
     wrap.appendChild(card);
-    prevDone = stars > 0;
   });
 
-  const allCleared = REALMS.every(r => (state.stars[r.key]||0) > 0);
   const bossBox = $('#boss-node');
-  bossBox.className = 'boss-node'+(allCleared?' ready':'');
-  bossBox.innerHTML = allCleared
-    ? `<div style="font-size:40px;">🐉</div><h3>El Dragón Gramatical</h3><p class="footer-note" style="font-size:12.5px;">¡Enfréntate al reto final mixto!</p>
-       <button class="btn btn-gold btn-block" id="boss-btn">${state.bossCleared? 'Jugar otra vez' : 'Iniciar batalla final'}</button>`
-    : `<div style="font-size:36px; opacity:.5;">🐉</div><h3 style="color:var(--ink-dim);">El Dragón Gramatical</h3><p class="footer-note">Gana al menos una estrella en cada reino para desbloquear la batalla final.</p>`;
-  if(allCleared){ $('#boss-btn').onclick = ()=>{ sfx.click(); startBoss(); }; }
+  bossBox.className = 'boss-node ready';
+  bossBox.innerHTML = `<div style="font-size:40px;">🐉</div><h3>El Dragón Gramatical</h3><p class="footer-note" style="font-size:12.5px;">¡Enfréntate al reto final mixto!</p>
+       <button class="btn btn-gold btn-block" id="boss-btn">${state.bossCleared? 'Jugar otra vez' : 'Iniciar batalla final'}</button>`;
+  $('#boss-btn').onclick = ()=>{ sfx.click(); startBoss(); };
 }
 
 function openRealm(key){
@@ -723,6 +750,13 @@ function answerQuestion(choice, item, btn, optWrap){
   buttons[item.a].classList.add('correct');
   if(!correct && choice>=0 && btn) btn.classList.add('wrong');
   buttons.forEach((b,i)=>{ if(i!==item.a && i!==choice) b.classList.add('dim'); });
+
+  const topicKey = item.topic || quizCtx.realmKey;
+  recordAnswer(topicKey, correct, correct ? null : {
+    question: item.text,
+    chosen: choice>=0 ? item.options[choice] : '(sin responder — se acabó el tiempo)',
+    correctAnswer: item.options[item.a],
+  });
 
   if(correct){
     quizCtx.correctCount += 1;
@@ -877,6 +911,7 @@ function flipCard(card, el){
         f1.el.classList.add('matched'); f2.el.classList.add('matched');
         memCtx.matched += 1; memCtx.flipped = []; memCtx.locked = false;
         sfx.correct();
+        recordAnswer('irregular', true);
         const r = f2.el.getBoundingClientRect();
         burst(r.left+r.width/2, r.top+r.height/2, ['#FF9E4A','#FFC857'], 14);
         updateMemoryHud();
@@ -885,6 +920,11 @@ function flipCard(card, el){
     } else {
       memCtx.locked = true;
       sfx.wrong();
+      recordAnswer('irregular', false, {
+        question:'Memoria: '+f1.card.label+' / '+f2.card.label,
+        chosen:'no forman pareja',
+        correctAnswer:'busca la forma pasada correcta',
+      });
       setTimeout(()=>{
         f1.el.classList.remove('flipped'); f2.el.classList.remove('flipped');
         memCtx.flipped = []; memCtx.locked = false;
@@ -974,6 +1014,83 @@ function handleShopClick(item, owned, isEquipped, equippedField){
     sfx.buy(); burstCenter(['#FFC857','#33E4C2']);
   }
   saveState(); renderHud(); renderShop(); updateHeroStage();
+}
+
+/* ---------------- Coach: rendimiento + ayuda de inglés ---------------- */
+
+function renderCoach(){
+  const statsWrap = $('#coach-stats');
+  statsWrap.innerHTML = '';
+  let weakest = null;
+  REALMS.forEach(r=>{
+    const st = ensureTopicStats(r.key);
+    const pct = st.attempts ? Math.round((st.correct/st.attempts)*100) : null;
+    const row = document.createElement('div');
+    row.className = 'stat-row';
+    row.innerHTML = `
+      <div class="stat-label">${r.icon} ${r.name}</div>
+      <div class="stat-bar-line">
+        <div class="stat-bar-track"><div class="stat-bar-fill" style="width:${pct===null?0:pct}%; background:${r.color}"></div></div>
+        <div class="stat-pct">${pct===null? '—' : pct+'%'}</div>
+      </div>`;
+    statsWrap.appendChild(row);
+    if(st.attempts >= 3 && (weakest===null || pct < weakest.pct)){
+      weakest = {key:r.key, name:r.name, pct, attempts:st.attempts};
+    }
+  });
+
+  const insightWrap = $('#coach-insight');
+  if(weakest){
+    insightWrap.innerHTML = `
+      <div class="card insight-card">
+        <div class="eyebrow">🧠 Tu Coach recomienda</div>
+        <h3 style="margin-top:4px;">Reforzar: ${weakest.name}</h3>
+        <p class="subtitle" style="text-align:left;">Llevas ${weakest.pct}% de aciertos ahí (${weakest.attempts} preguntas respondidas). ${TOPIC_TIPS[weakest.key]}</p>
+        <button class="btn btn-gold btn-block" id="coach-practice-btn">Practicar ahora</button>
+      </div>`;
+    $('#coach-practice-btn').onclick = ()=>{ sfx.click(); openRealm(weakest.key); };
+  } else {
+    insightWrap.innerHTML = `
+      <div class="card insight-card">
+        <div class="eyebrow">🧠 Tu Coach recomienda</div>
+        <p class="subtitle" style="text-align:left;">Juega un poco más en cada tema (al menos 3 preguntas) para que tu Coach pueda detectar dónde necesitas reforzar.</p>
+      </div>`;
+  }
+
+  const mistakesWrap = $('#coach-mistakes');
+  const mistakes = state.stats.recentMistakes;
+  if(!mistakes.length){
+    mistakesWrap.innerHTML = '<p class="subtitle" style="text-align:left;">Aún no tienes errores registrados — ¡sigue jugando!</p>';
+  } else {
+    mistakesWrap.innerHTML = mistakes.map(m=>{
+      const topicName = (REALMS.find(r=>r.key===m.topic)||{}).name || m.topic;
+      return `<div class="mistake-row">
+        <div class="mistake-topic">${topicName}</div>
+        <div class="mistake-q">${m.question}</div>
+        <div class="mistake-answers"><span class="wrong-ans">✗ ${m.chosen}</span><span class="right-ans">✓ ${m.correctAnswer}</span></div>
+      </div>`;
+    }).join('');
+  }
+}
+
+function initCoachScreen(){
+  const input = $('#coach-search-input');
+  const results = $('#coach-search-results');
+  function runSearch(){
+    const matches = matchFAQ(input.value);
+    if(!input.value.trim()){ results.innerHTML = ''; return; }
+    if(!matches.length){
+      results.innerHTML = `<div class="faq-card"><p class="subtitle" style="text-align:left; margin:0;">No encontré nada para "${input.value}". Prueba con otra palabra, por ejemplo "pasado", "comparativos" o "voz pasiva".</p></div>`;
+      return;
+    }
+    results.innerHTML = matches.map(t=>`
+      <div class="faq-card">
+        <div class="faq-title">${t.title}</div>
+        <p class="subtitle" style="text-align:left; margin:4px 0 0;">${t.body}</p>
+      </div>`).join('');
+  }
+  $('#coach-search-btn').onclick = ()=>{ sfx.click(); runSearch(); };
+  input.addEventListener('keydown', e=>{ if(e.key==='Enter'){ sfx.click(); runSearch(); } });
 }
 
 /* ---------------- Online: código de equipo (PeerJS, sin backend propio) ---------------- */
@@ -1289,6 +1406,7 @@ function bootUI(){
   initWelcome();
   initTabbar();
   initOnlineScreen();
+  initCoachScreen();
   initHeroStage();
   renderHud();
   if(state.started){ renderMap(); showScreen('map'); }
