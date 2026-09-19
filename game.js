@@ -1,5 +1,5 @@
 /* ============================================================
-   GrammarQuest — los Reinos del Inglés
+   GrammarQuest — El Gran Espectáculo del Inglés
    Motor del juego + banco de preguntas. Sin build, un solo archivo.
    Las preguntas del quiz quedan en inglés (es lo que se enseña);
    todo el menú y la navegación están en español.
@@ -7,15 +7,15 @@
 (function(){
 "use strict";
 
-/* ---------------- contenido: reinos y preguntas ---------------- */
+/* ---------------- contenido: atracciones y preguntas ---------------- */
 
 const REALMS = [
-  {key:'present',    name:'Aldea del Presente',  icon:'🏘️', color:'#33E4C2', desc:'Presente simple y continuo'},
-  {key:'past',        name:'Ruinas del Pasado',   icon:'🏛️', color:'#FFC857', desc:'Pasado simple y continuo'},
-  {key:'passive',     name:'Fortaleza Pasiva',    icon:'🏰', color:'#9B6BFF', desc:'Voz pasiva'},
-  {key:'adjectives',  name:'Jardín de Adjetivos', icon:'🌺', color:'#FF6B8B', desc:'Comparativos y superlativos'},
-  {key:'regular',     name:'Forja Regular',       icon:'⚒️', color:'#7DB2FF', desc:'Verbos regulares (-ed)'},
-  {key:'irregular',   name:'Cuevas Irregulares',  icon:'🔮', color:'#FF9E4A', desc:'Verbos irregulares — memoria'},
+  {key:'present',    name:'El Carnaval del Presente',   icon:'🎪', color:'#1F7A68', desc:'Presente simple y continuo'},
+  {key:'past',        name:'El Cine Mudo del Pasado',    icon:'🎞️', color:'#8B5E2E', desc:'Pasado simple y continuo'},
+  {key:'passive',     name:'El Teatro de Marionetas',    icon:'🎭', color:'#6B3FA0', desc:'Voz pasiva'},
+  {key:'adjectives',  name:'El Circo de los Adjetivos',  icon:'🎠', color:'#C4293D', desc:'Comparativos y superlativos'},
+  {key:'regular',     name:'La Fábrica de Tinta',        icon:'🏭', color:'#1F5FA8', desc:'Verbos regulares (-ed)'},
+  {key:'irregular',   name:'El Tren Fantasma',           icon:'🎢', color:'#B8621B', desc:'Verbos irregulares — memoria'},
 ];
 
 function q(text, options, answerIndex){ return {text, options, a:answerIndex}; }
@@ -206,7 +206,7 @@ const TOPIC_TIPS = {
   passive: 'La voz pasiva se forma con be + participio pasado, y el objeto de la acción pasa a ser el sujeto: "Cats chase mice" → "Mice are chased by cats". En pasado usa was/were + participio.',
   adjectives: 'Adjetivos cortos: añade -er/-est (tall→taller→the tallest). Adjetivos largos: usa more/the most (interesting→more interesting). El orden es: opinión, tamaño, edad, forma, color, origen, material.',
   regular: 'Se forma agregando -ed (walk→walked). Si termina en "e", solo agrega -d (like→liked). Si termina en consonante+y, cambia a -ied (study→studied). Si es una sílaba corta (CVC), duplica la consonante (stop→stopped).',
-  irregular: 'No siguen una regla fija — hay que memorizarlos de a poco. Algunos muy comunes: go→went, see→saw, eat→ate, have→had, take→took, buy→bought. Practica con el minijuego de memoria de las Cuevas Irregulares.',
+  irregular: 'No siguen una regla fija — hay que memorizarlos de a poco. Algunos muy comunes: go→went, see→saw, eat→ate, have→had, take→took, buy→bought. Practica con el minijuego de memoria del Tren Fantasma.',
 };
 
 const FAQ_TIPS = [
@@ -380,7 +380,7 @@ function resizeCanvas(){ canvas.width = innerWidth; canvas.height = innerHeight;
 addEventListener('resize', resizeCanvas); resizeCanvas();
 function burst(x,y,colors,count){
   if(reduceMotion) return;
-  colors = colors || ['#9B6BFF','#33E4C2','#FFC857','#FF6B8B'];
+  colors = colors || ['#C4293D','#1F7A68','#D9A429','#D94F68'];
   for(let i=0;i<(count||26);i++){
     particles.push({
       x,y, vx:(Math.random()-.5)*7, vy:-Math.random()*7-2,
@@ -585,7 +585,7 @@ function cancelActiveQuiz(){
   if(quizCtx && quizCtx.timer){ clearInterval(quizCtx.timer); }
 }
 
-/* ---------------- mapa de reinos ("Temas") ---------------- */
+/* ---------------- atracciones ("Temas") ---------------- */
 function starsHtml(count){
   let h = '';
   for(let i=0;i<3;i++) h += `<span class="star ${i<count?'on':''}">★</span>`;
@@ -610,7 +610,7 @@ function renderMap(){
 
   const bossBox = $('#boss-node');
   bossBox.className = 'boss-node ready';
-  bossBox.innerHTML = `<div style="font-size:40px;">🐉</div><h3>El Dragón Gramatical</h3><p class="footer-note" style="font-size:12.5px;">¡Enfréntate al reto final mixto!</p>
+  bossBox.innerHTML = `<div style="font-size:40px;">🖋️</div><h3>El Profesor Tinta</h3><p class="footer-note" style="font-size:12.5px;">¡Enfréntate al reto final mixto!</p>
        <button class="btn btn-gold btn-block" id="boss-btn">${state.bossCleared? 'Jugar otra vez' : 'Iniciar batalla final'}</button>`;
   $('#boss-btn').onclick = ()=>{ sfx.click(); startBoss(); };
 }
@@ -647,7 +647,7 @@ function startBoss(){
   Object.keys(QUESTIONS).forEach(k=>{ mixed.push(...sample(QUESTIONS[k], 2).map(x=>({...x, topic:k}))); });
   mixed.push(...sample(IRREGULAR_MCQ, 3).map(x=>({...x, topic:'irregular'})));
   quizCtx = {
-    realmKey:'boss', realmName:'El Dragón Gramatical', color:'#FF6B8B',
+    realmKey:'boss', realmName:'El Profesor Tinta', color:'#8E1B2B',
     questions: sample(mixed, mixed.length),
     idx:0, correctCount:0, lives:3, combo:0, timer:null, timeLeft:20,
     isBoss:true, isOnline:false, hp:100, xpEarned:0, coinsEarned:0,
@@ -675,7 +675,7 @@ function renderQuizChrome(){
 }
 function updateDragonHp(){
   $('#dragon-hpfill').style.width = Math.max(0,quizCtx.hp)+'%';
-  $('#dragon-hplabel').textContent = 'Vida del dragón: '+Math.max(0,quizCtx.hp)+'%';
+  $('#dragon-hplabel').textContent = 'Vida de Profesor Tinta: '+Math.max(0,quizCtx.hp)+'%';
 }
 
 function renderHearts(){
@@ -815,24 +815,24 @@ function finishQuiz(){
       saveState();
     }
     showResult({
-      title: stars>0 ? '¡Reino superado!' : '¡Sigue practicando!',
+      title: stars>0 ? '¡Atracción superada!' : '¡Sigue practicando!',
       stars, correct: quizCtx.correctCount, total,
       xp: quizCtx.xpEarned, coins: quizCtx.coinsEarned,
       onContinue: ()=>{ renderMap(); showScreen('map'); },
       onRetry: ()=>{ closeOverlay(); startQuiz(quizCtx.realmKey); },
     });
-    if(stars>0){ sfx.win(); burstCenter([quizCtx.color,'#FFC857','#33E4C2']); }
+    if(stars>0){ sfx.win(); burstCenter([quizCtx.color,'#D9A429','#1F7A68']); }
   }
 }
 
 function showBossResult(won, ctx){
-  if(won){ state.bossCleared = true; saveState(); sfx.win(); burstCenter(['#FF6B8B','#FFC857','#9B6BFF','#33E4C2']); }
+  if(won){ state.bossCleared = true; saveState(); sfx.win(); burstCenter(['#8E1B2B','#D9A429','#C4293D','#1F7A68']); }
   showResult({
-    title: won ? '🐉 ¡Dragón derrotado!' : 'El dragón escapó...',
+    title: won ? '🖋️ ¡Profesor Tinta derrotado!' : 'Profesor Tinta escapó entre las páginas...',
     stars: won ? 3 : 1,
     correct: ctx.correctCount, total: ctx.questions.length,
     xp: ctx.xpEarned, coins: ctx.coinsEarned,
-    subtitle: won ? '¡Eres el campeón de la gramática de los Reinos!' : 'Repasa los reinos e inténtalo de nuevo — ¡tú puedes!',
+    subtitle: won ? '¡Eres el campeón de la gramática del Gran Espectáculo!' : 'Repasa las atracciones e inténtalo de nuevo — ¡tú puedes!',
     onContinue: ()=>{ renderMap(); showScreen('map'); },
     onRetry: ()=>{ closeOverlay(); startBoss(); },
   });
@@ -913,7 +913,7 @@ function flipCard(card, el){
         sfx.correct();
         recordAnswer('irregular', true);
         const r = f2.el.getBoundingClientRect();
-        burst(r.left+r.width/2, r.top+r.height/2, ['#FF9E4A','#FFC857'], 14);
+        burst(r.left+r.width/2, r.top+r.height/2, ['#B8621B','#D9A429'], 14);
         updateMemoryHud();
         if(memCtx.matched === memCtx.total) finishMemory();
       }, 500);
@@ -940,10 +940,10 @@ function finishMemory(){
   const xp = 60, coins = 30;
   if(stars > (state.stars.irregular||0)){ state.stars.irregular = stars; saveState(); }
   grantXp(xp); grantCoins(coins);
-  sfx.win(); burstCenter(['#FF9E4A','#FFC857','#33E4C2']);
+  sfx.win(); burstCenter(['#B8621B','#D9A429','#1F7A68']);
   setTimeout(()=>{
     showResult({
-      title:'¡Cuevas Irregulares superadas!', stars, correct:memCtx.total, total:memCtx.total,
+      title:'¡Tren Fantasma superado!', stars, correct:memCtx.total, total:memCtx.total,
       xp, coins,
       subtitle: 'Movimientos usados: '+memCtx.moves,
       onContinue: ()=>{ renderMap(); showScreen('map'); },
@@ -1011,7 +1011,7 @@ function handleShopClick(item, owned, isEquipped, equippedField){
     state.coins -= item.price;
     state.inventory[equippedField].push(item.id);
     state.equipped[equippedField] = item.id;
-    sfx.buy(); burstCenter(['#FFC857','#33E4C2']);
+    sfx.buy(); burstCenter(['#D9A429','#1F7A68']);
   }
   saveState(); renderHud(); renderShop(); updateHeroStage();
 }
@@ -1314,7 +1314,7 @@ function hostStartChallenge(topicKey){
 function beginOnlineChallenge(){
   online.challengeActive = true;
   quizCtx = {
-    realmKey:'online', realmName: online.topicLabel || 'Reto en equipo', color:'#33E4C2',
+    realmKey:'online', realmName: online.topicLabel || 'Reto en equipo', color:'#1F7A68',
     questions: online.questions, idx:0, correctCount:0, lives:3, combo:0, timer:null, timeLeft:20,
     isBoss:false, isOnline:true, xpEarned:0, coinsEarned:0,
   };
@@ -1380,7 +1380,7 @@ function showOnlineEnd(payload){
   let stars = 0;
   if(pct >= 0.9) stars = 3; else if(pct >= 0.7) stars = 2; else if(pct >= 0.4) stars = 1;
   const me = payload.players.find(p=>p.id === online.myId) || {correct:0};
-  sfx.win(); burstCenter(['#33E4C2','#FFC857','#9B6BFF']);
+  sfx.win(); burstCenter(['#1F7A68','#D9A429','#C4293D']);
   showResult({
     title: stars>0 ? '¡Reto en equipo superado!' : 'El equipo necesita más práctica',
     subtitle: 'Entre todos sumaron '+payload.sum+' / '+payload.total+' respuestas correctas.',

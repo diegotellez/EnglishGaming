@@ -1,4 +1,4 @@
-# GrammarQuest — los Reinos del Inglés 🗺️✨
+# GrammarQuest — El Gran Espectáculo del Inglés 🎪✨
 
 Juego web de aventura para aprender inglés, pensado para estudiantes de
 **Octavo**. Sin frameworks, sin build: HTML + CSS + JavaScript puro, abre
@@ -8,43 +8,46 @@ porque son el contenido que se está enseñando.
 
 La app tiene cuatro apartados, accesibles desde la barra inferior:
 
-- **🗺️ Temas** — cada tema gramatical es su propia tarjeta independiente,
+- **🎬 Temas** — cada tema gramatical es su propia tarjeta independiente,
   **todos jugables desde el principio** (sin desbloqueo progresivo).
 - **🌐 Online** — jugar en equipo con un código, en tiempo real.
-- **🎒 Tienda** — gastar las monedas ganadas en personalizar al héroe.
+- **🎩 Tienda** — gastar las monedas ganadas en personalizar al héroe.
 - **🧠 Coach** — un panel que analiza tus respuestas reales y una guía de
   dudas de inglés (ver más abajo).
 
-## El personaje en 2D, estilo cartoon vintage
+## El look: cartoon vintage de los años 30
 
-Arriba de "Temas" y de "Tienda" hay una ilustración del héroe dibujada en
-SVG con estética "rubber-hose" (los dibujos animados de los años 30:
-contornos negros gruesos, guantes blancos, fondo crema con viñeta). La
-cara del personaje es el emoji que elegiste; el sombrero, el vehículo y
-la comida que tengas equipados aparecen como accesorios junto a él, y el
-color del cuerpo cambia según el personaje elegido en la Tienda. Tiene
-una animación de rebote constante y salta si le haces click/tap.
+Toda la app (colores, tipografía, botones, y el personaje) sigue una
+sola estética "rubber-hose": el estilo de animación de los años 30
+(contornos de tinta negra gruesos, papel crema con viñeta y grano,
+guantes blancos, colores de cartel de circo — rojo, mostaza, verde
+azulado). El título usa la tipografía "Alfa Slab One" (cartel vintage) y
+el resto del texto "Nunito" para que siga siendo legible.
+
+El héroe es una ilustración en **SVG 2D** (no 3D, no depende de ninguna
+librería externa): contornos gruesos, guantes blancos, fondo crema con
+viñeta. La cara es el emoji que elegiste; el sombrero, el vehículo y la
+comida equipados aparecen como accesorios junto a él, y el color del
+cuerpo cambia según el personaje elegido en la Tienda. Tiene una
+animación de rebote constante y salta si le haces click/tap.
 
 Nota: esto es un homenaje **al estilo** de animación de los años 30 (el
-mismo que usa el videojuego Cuphead), dibujado desde cero para este
-proyecto — no reproduce el personaje ni la marca de Cuphead, que son
-propiedad de Studio MDHR.
-
-No depende de ninguna librería externa (es SVG + CSS puro), así que
-siempre funciona, incluso sin conexión, y es mucho más liviano que un
-motor 3D.
+mismo que usa el videojuego Cuphead), construido desde cero para este
+proyecto con nombres e ilustraciones originales — no reproduce ningún
+personaje, logo ni marca de Cuphead, que son propiedad de Studio MDHR.
 
 ## Temas cubiertos (apartado "Temas")
 
-Todos disponibles desde el principio:
+Todos disponibles desde el principio, cada uno como su propia atracción
+del espectáculo:
 
-- **Aldea del Presente** — Present Simple & Present Continuous
-- **Ruinas del Pasado** — Past Simple & Past Continuous
-- **Fortaleza Pasiva** — Voz pasiva (presente y pasado)
-- **Jardín de Adjetivos** — Comparativos, superlativos y orden de adjetivos
-- **Forja Regular** — Verbos regulares y reglas de ortografía del `-ed`
-- **Cuevas Irregulares** — Verbos irregulares, como minijuego de memoria (memory match)
-- **El Dragón Gramatical** — Batalla final: reto mixto de todos los temas
+- **El Carnaval del Presente** — Present Simple & Present Continuous
+- **El Cine Mudo del Pasado** — Past Simple & Past Continuous
+- **El Teatro de Marionetas** — Voz pasiva (presente y pasado)
+- **El Circo de los Adjetivos** — Comparativos, superlativos y orden de adjetivos
+- **La Fábrica de Tinta** — Verbos regulares y reglas de ortografía del `-ed`
+- **El Tren Fantasma** — Verbos irregulares, como minijuego de memoria (memory match)
+- **El Profesor Tinta** — Batalla final: reto mixto de todos los temas
 
 ## Coach (apartado "Coach")
 
@@ -130,7 +133,7 @@ solo decorativa.
 - Sistema de nivel, experiencia (XP) y monedas, guardado en `localStorage`
   del navegador (el progreso es por dispositivo/navegador).
 - Minijuego de memoria (cartas) para los verbos irregulares.
-- Batalla final contra "el Dragón Gramatical" con barra de vida.
+- Batalla final contra "El Profesor Tinta" con barra de vida.
 - Efectos de sonido sintetizados con Web Audio (sin archivos externos) y
   confeti en Canvas al acertar. El modo individual funciona offline una
   vez cargado; el modo Online necesita internet.
@@ -155,7 +158,7 @@ Safari). No requiere servidor ni instalación.
 ```
 index.html      Documento completo (para abrir directo o publicar en Pages)
 artifact.html   Misma UI, como fragmento (usado para probarlo como Claude Artifact)
-style.css       Todos los estilos (tema oscuro tipo arcade de fantasía)
+style.css       Todos los estilos (tema cartoon vintage: papel crema y tinta)
 game.js         Lógica del juego + banco de preguntas y verbos irregulares
 ```
 

@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>GrammarQuest — los Reinos del Inglés</title>
-<meta name="description" content="Juego de aventura para aprender inglés: tiempos verbales, voz pasiva, adjetivos y verbos regulares e irregulares, con modo Online por equipos y tienda de personalización.">
-<meta name="color-scheme" content="dark">
+<title>GrammarQuest — El Gran Espectáculo del Inglés</title>
+<meta name="description" content="Juego de aventura estilo cartoon vintage para aprender inglés: tiempos verbales, voz pasiva, adjetivos y verbos regulares e irregulares, con modo Online por equipos y tienda de personalización.">
+<meta name="color-scheme" content="light">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -30,9 +30,9 @@
   <main>
     <!-- BIENVENIDA -->
     <section id="screen-welcome" class="screen">
-      <div class="hero-badge">🗺️✨</div>
+      <div class="hero-badge">🎪✨</div>
       <h1 class="title-xl">GrammarQuest</h1>
-      <p class="subtitle">¡Recorre los Reinos del Inglés! Domina los tiempos verbales, la voz pasiva, los adjetivos y los verbos para derrotar al Dragón Gramatical. 🐉<br><span style="opacity:.8;">Juega solo o conéctate con tu equipo en el modo Online.</span></p>
+      <p class="subtitle">¡Recorre las atracciones del inglés! Domina los tiempos verbales, la voz pasiva, los adjetivos y los verbos para vencer a Profesor Tinta. 🖋️<br><span style="opacity:.8;">Juega solo o conéctate con tu equipo en el modo Online.</span></p>
       <div class="card" style="display:flex; flex-direction:column; gap:16px;">
         <div>
           <span class="field-label">Elige tu personaje</span>
@@ -44,13 +44,13 @@
         </div>
         <button class="btn btn-primary btn-block" id="start-btn">¡Comenzar la aventura! ⚔️</button>
       </div>
-      <p class="footer-note">6 reinos · cuevas de verbos irregulares · batalla final · modo Online · tienda</p>
+      <p class="footer-note">6 atracciones · tren fantasma de irregulares · función final · modo Online · tienda</p>
     </section>
 
-    <!-- TEMAS (mapa de reinos) -->
+    <!-- TEMAS (atracciones) -->
     <section id="screen-map" class="screen" hidden>
       <div class="eyebrow" style="text-align:center;">Temas</div>
-      <h2 class="title-xl" style="font-size:24px; text-align:center;">Elige un reino para explorar</h2>
+      <h2 class="title-xl" style="font-size:24px; text-align:center;">Elige una atracción para explorar</h2>
       <div class="mode-grid" id="map-path"></div>
       <div id="boss-node" class="boss-node"></div>
     </section>
@@ -58,9 +58,9 @@
     <!-- QUIZ -->
     <section id="screen-quiz" class="screen" hidden>
       <div id="quiz-dragon" class="dragon-wrap" hidden>
-        <div class="dragon-emoji" id="dragon-emoji">🐉</div>
+        <div class="dragon-emoji" id="dragon-emoji">🖋️</div>
         <div class="hpbar-track"><div class="hpbar-fill" id="dragon-hpfill" style="width:100%"></div></div>
-        <div class="hp-label" id="dragon-hplabel">Vida del dragón: 100%</div>
+        <div class="hp-label" id="dragon-hplabel">Vida de Profesor Tinta: 100%</div>
       </div>
       <div id="quiz-teambar-wrap" class="teambar-wrap" hidden>
         <div class="teambar-track"><div class="teambar-fill" id="quiz-teambar-fill" style="width:0%"></div></div>
@@ -79,7 +79,7 @@
       </div>
       <span class="combo-chip" id="combo-chip" hidden>🔥 Racha</span>
       <div class="card question-card">
-        <div class="question-topic" id="quiz-topic">Reino</div>
+        <div class="question-topic" id="quiz-topic">Atracción</div>
         <div class="question-text" id="quiz-question">Pregunta</div>
       </div>
       <div class="options-grid" id="quiz-options"></div>
@@ -87,7 +87,7 @@
 
     <!-- MEMORIA -->
     <section id="screen-memory" class="screen" hidden>
-      <div class="eyebrow" style="text-align:center;">Cuevas Irregulares</div>
+      <div class="eyebrow" style="text-align:center;">El Tren Fantasma</div>
       <h2 class="title-xl" style="font-size:22px; text-align:center;">Une cada verbo con su forma pasada</h2>
       <div class="memory-hud"><span id="mem-moves">Movimientos: 0</span><span id="mem-pairs">Parejas: 0 / 8</span></div>
       <div class="memory-grid" id="memory-grid"></div>
@@ -177,9 +177,9 @@
   </main>
 
   <nav id="tabbar" class="tabbar" hidden>
-    <button class="tab-btn active" data-tab="map"><span class="tab-ic">🗺️</span>Temas</button>
+    <button class="tab-btn active" data-tab="map"><span class="tab-ic">🎬</span>Temas</button>
     <button class="tab-btn" data-tab="online"><span class="tab-ic">🌐</span>Online</button>
-    <button class="tab-btn" data-tab="shop"><span class="tab-ic">🎒</span>Tienda</button>
+    <button class="tab-btn" data-tab="shop"><span class="tab-ic">🎩</span>Tienda</button>
     <button class="tab-btn" data-tab="coach"><span class="tab-ic">🧠</span>Coach</button>
   </nav>
 
