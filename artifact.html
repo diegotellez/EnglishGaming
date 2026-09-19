@@ -95,24 +95,25 @@
       <div class="shop-grid" id="shop-grid"></div>
     </section>
 
-    <!-- MUNDO -->
-    <section id="screen-world" class="screen" hidden>
-      <div class="eyebrow" style="text-align:center;">Mundo</div>
-      <h2 class="title-xl" style="font-size:22px; text-align:center;">Explora el Gran Espectáculo en 2D</h2>
+    <!-- TRADUCTOR -->
+    <section id="screen-translator" class="screen" hidden>
+      <div class="eyebrow" style="text-align:center;">Traductor</div>
+      <h2 class="title-xl" style="font-size:22px; text-align:center;">Traductor de palabras</h2>
+      <p class="subtitle">Traduce palabras o frases cortas entre inglés y español.</p>
 
-      <div id="world-setup">
-        <p class="subtitle">Elige al menos 5 temas — entre más elijas, más grande y variado será el mundo. Te sugerimos los que más practicas (según tus datos reales del Coach).</p>
-        <div class="topic-chips" id="world-topic-picker"></div>
-        <p class="footer-note" id="world-count-label" style="text-align:center; margin-top:8px;"></p>
-        <button class="btn btn-primary btn-block" id="world-build-btn" style="margin-top:10px;">Construir mi mundo</button>
+      <div class="card">
+        <button class="btn btn-ghost btn-block" id="translator-swap">🔄 <span id="translator-direction">Inglés → Español</span></button>
+        <div class="coach-search-row" style="margin-top:10px;">
+          <input class="text-input" id="translator-input" placeholder="Escribe una palabra en inglés...">
+          <button class="btn btn-primary" id="translator-btn">Traducir</button>
+        </div>
+        <div id="translator-result"></div>
+        <p class="footer-note" style="text-align:left; margin-top:8px;">Usa un servicio gratuito de traducción (MyMemory) — necesita internet y puede no ser perfecto con modismos o frases largas.</p>
       </div>
 
-      <div id="world-map-wrap" hidden>
-        <div class="world-scroll" id="world-scroll">
-          <canvas id="world-canvas"></canvas>
-        </div>
-        <p class="footer-note" style="text-align:center;">Toca el mapa para caminar. Toca a un personaje para hablar con él y empezar su reto.</p>
-        <button class="btn btn-ghost btn-block" id="world-edit-btn">Elegir otros temas</button>
+      <div class="card">
+        <div class="eyebrow">Verbos irregulares para probar</div>
+        <div class="topic-chips" id="translator-quick" style="margin-top:8px;"></div>
       </div>
     </section>
 
@@ -181,7 +182,7 @@
 
   <nav id="tabbar" class="tabbar" hidden>
     <button class="tab-btn active" data-tab="map"><span class="tab-ic">🎬</span>Temas</button>
-    <button class="tab-btn" data-tab="world"><span class="tab-ic">🗺️</span>Mundo</button>
+    <button class="tab-btn" data-tab="translator"><span class="tab-ic">🔤</span>Traductor</button>
     <button class="tab-btn" data-tab="online"><span class="tab-ic">🌐</span>Online</button>
     <button class="tab-btn" data-tab="shop"><span class="tab-ic">🎩</span>Tienda</button>
     <button class="tab-btn" data-tab="coach"><span class="tab-ic">🧠</span>Coach</button>

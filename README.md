@@ -10,8 +10,7 @@ La app tiene cinco apartados, accesibles desde la barra inferior:
 
 - **🎬 Temas** — cada tema gramatical es su propia tarjeta independiente,
   **todos jugables desde el principio** (sin desbloqueo progresivo).
-- **🗺️ Mundo** — un mapa 2D explorable (campo, pueblo y ciudad) con un
-  personaje por cada tema elegido (ver más abajo).
+- **🔤 Traductor** — traduce palabras o frases cortas inglés↔español.
 - **🌐 Online** — jugar en equipo con un código, en tiempo real.
 - **🎩 Tienda** — gastar las monedas ganadas en personalizar al héroe.
 - **🧠 Coach** — panel de resultados reales (rendimiento por tema y
@@ -29,9 +28,16 @@ el resto del texto "Nunito" para que siga siendo legible.
 El héroe es una ilustración en **SVG 2D** (no 3D, no depende de ninguna
 librería externa): contornos gruesos, guantes blancos, fondo crema con
 viñeta. La cara es el emoji que elegiste; el sombrero, el vehículo y la
-comida equipados aparecen como accesorios junto a él, y el color del
-cuerpo cambia según el personaje elegido en la Tienda. Tiene una
+comida equipados aparecen como accesorios junto a él. Tiene una
 animación de rebote constante y salta si le haces click/tap.
+
+Cada uno de los 16 personajes de la Tienda tiene, además de su propio
+color de cuerpo, un rasgo visual propio que lo distingue: el unicornio
+tiene cuerno, el elfo y el lobo tienen orejas puntiagudas, el robot
+antena, el dragón alas, el rey corona y capa, el vampiro cuello de capa,
+la hada alas de hada, el ninja bandana, etc. — no son 16 cuerpos
+dibujados desde cero, sino el mismo cuerpo base con un accesorio de
+firma por personaje (ver `CHAR_TINTS`/`charAccentSlots` en `game.js`).
 
 Nota: esto es un homenaje **al estilo** de animación de los años 30 (el
 mismo que usa el videojuego Cuphead), construido desde cero para este
@@ -71,32 +77,28 @@ cada partida:
 
 - **Rendimiento por tema**: barra de % de aciertos por cada uno de los 6
   temas, calculada sobre todas las preguntas respondidas (quiz individual,
-  memoria de irregulares, batalla final, reto Online y Mundo).
+  memoria de irregulares, batalla final y reto Online).
 - **Recomendación**: cuando hay suficientes datos (3+ respuestas en un
   tema), señala el tema más débil con un consejo corto y un botón para
   practicarlo directamente.
 - **Últimos errores**: las últimas preguntas falladas, con tu respuesta y
   la respuesta correcta lado a lado.
 
-Estos mismos datos (cuántas preguntas respondiste por tema) son los que
-usa el apartado **Mundo** para sugerir qué temas construir en el mapa.
+## Traductor (apartado "Traductor")
 
-## Mundo (apartado "Mundo")
+Traductor simple de palabras o frases cortas, en cualquier dirección
+(inglés→español o español→inglés, con un botón para invertir). Usa
+[MyMemory](https://mymemory.translated.net/), un servicio de traducción
+gratuito que no requiere clave de API — por eso sí se puede llamar
+directo desde el navegador, a diferencia del chat con IA (ver abajo).
+Necesita internet, y como cualquier traductor automático puede fallar
+con modismos o frases largas/ambiguas. También incluye una lista rápida
+con verbos irregulares del juego para probar con un toque.
 
-Un mapa 2D explorable, en el mismo estilo cartoon vintage:
-
-1. Eliges **al menos 5 de los 6 temas** (se sugieren los que más
-   practicas, según los datos reales del Coach). Cuantos más elijas, más
-   grande es el mapa.
-2. Se genera un mundo con tres zonas de izquierda a derecha — **Campo**,
-   **Pueblo** y **Ciudad** — cada tema tiene un personaje/parada propia en
-   una de las zonas, y al final del mapa siempre está la torre de **El
-   Profesor Tinta** (el jefe final).
-3. Caminas tocando el mapa (tu personaje se mueve hacia donde tocas; la
-   cámara te sigue). Al acercarte a un personaje, tocarlo abre un diálogo
-   con el botón **"Comenzar reto"**, que lanza el mismo quiz (o el memory,
-   para verbos irregulares) que en el apartado Temas — es el mismo motor
-   de juego, solo con otra forma de llegar a él.
+No pude verificar una traducción real de punta a punta desde este
+entorno de desarrollo (bloquea las llamadas salientes a ese servicio),
+así que pruébenlo ustedes en un navegador normal antes de darlo por
+sentado en clase.
 
 ## Sobre el pedido de un chat con IA (Gemini)
 
@@ -108,9 +110,12 @@ directamente en el código de una página web pública (como esta, en
 GitHub Pages), porque cualquiera que abra el código fuente podría
 copiarla y usarla a tu costa. Sin ese backend no hay forma segura de
 ofrecer un chat con Gemini/Claude/ChatGPT desde este proyecto tal como
-está (HTML+JS estático, sin servidor). Es la pieza pendiente — dime si
-tienes o puedes conseguir una clave de API y dónde alojarías ese
-backend, y lo construimos aparte.
+está (HTML+JS estático, sin servidor). Es la pieza pendiente: falta que
+consigas una clave de Gemini gratis en
+[aistudio.google.com/apikey](https://aistudio.google.com/apikey) y me la
+pases — con eso armo un backend chico (Cloudflare Workers, gratis) que
+la esconda, con herramientas (function calling) hechas a la medida de
+GrammarQuest, y lo conecto al chat en "Temas".
 
 ## Modo Online (apartado "Online")
 
@@ -216,8 +221,9 @@ variedad.
 Los artículos de la tienda viven en `game.js`, en el objeto `SHOP`
 (categorías `personajes`, `sombreros`, `vehiculos`, `comida`). Cada
 artículo es `{id, icon, name, price}` — `price: 0` lo deja gratis desde
-el principio (los personajes iniciales funcionan así). El color del
-cuerpo del personaje 2D para cada `id` de personaje está en `CHAR_TINTS`.
+el principio (los personajes iniciales funcionan así). El color de
+cuerpo y el rasgo distintivo del personaje 2D para cada `id` de
+personaje están en `CHAR_TINTS` y `charAccentSlots()`.
 
 ## Personalizar los consejos del Coach
 

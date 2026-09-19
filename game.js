@@ -289,7 +289,6 @@ function defaultState(){
     inventory:{personajes:[], sombreros:[], vehiculos:[], comida:[]},
     equipped:{personaje:null, sombreros:null, vehiculos:null, comida:null},
     stats:{byTopic: defaultStatsByTopic(), recentMistakes:[]},
-    world:null,
   };
 }
 
@@ -441,7 +440,7 @@ const screens = {
   shop: $('#screen-shop'),
   online: $('#screen-online'),
   coach: $('#screen-coach'),
-  world: $('#screen-world'),
+  translator: $('#screen-translator'),
 };
 let overlay = null;
 
@@ -483,8 +482,84 @@ function currentCharTint(){
 }
 function escXml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
+const INK = '#1a1410';
+const CREAM_FACE = '#FFF7E8';
+
+function currentCharId(){
+  const item = SHOP.personajes.find(p=>p.icon===state.avatar);
+  return item ? item.id : null;
+}
+
+/* Cada personaje tiene un rasgo propio (orejas, alas, antena, capa...) que se
+   dibuja en una de estas cuatro capas del cuerpo, para que se note la
+   personalidad sin tener que rediseñar todo el cuerpo desde cero. */
+function charAccentSlots(id, tint){
+  const slots = {behindBody:'', onBody:'', behindHead:'', onHead:''};
+  const ear = (x1,mirror)=>{
+    const x = mirror ? 260-x1 : x1;
+    const pts = mirror ? `${x},70 ${x+22},53 ${x-3},92` : `${x},70 ${x-22},53 ${x+3},92`;
+    return `<polygon points="${pts}" fill="${CREAM_FACE}" stroke="${INK}" stroke-width="4"/>`;
+  };
+  switch(id){
+    case 'wizard':
+      slots.onBody = `<text x="130" y="126" font-size="17" text-anchor="middle" dominant-baseline="central">✦</text>`;
+      break;
+    case 'hero':
+      slots.onBody = `<polygon points="130,116 134,126 145,126 136,133 139,144 130,137 121,144 124,133 115,126 126,126" fill="${CREAM_FACE}" stroke="${INK}" stroke-width="3"/>`;
+      break;
+    case 'ninja':
+      slots.behindHead = `<path d="M84,58 Q55,50 34,58" fill="none" stroke="${tint}" stroke-width="7" stroke-linecap="round"/><path d="M176,58 Q205,50 226,58" fill="none" stroke="${tint}" stroke-width="7" stroke-linecap="round"/>`;
+      break;
+    case 'elf':
+      slots.behindHead = ear(88,false)+ear(88,true);
+      break;
+    case 'vampire':
+      slots.behindBody = `<polygon points="104,112 92,82 122,108" fill="${tint}" stroke="${INK}" stroke-width="4"/><polygon points="156,112 168,82 138,108" fill="${tint}" stroke="${INK}" stroke-width="4"/>`;
+      break;
+    case 'villain':
+      slots.onHead = `<polygon points="98,36 90,18 108,30" fill="${INK}"/><polygon points="162,36 170,18 152,30" fill="${INK}"/>`;
+      break;
+    case 'fairy':
+      slots.behindBody = `<ellipse cx="88" cy="118" rx="20" ry="32" fill="${CREAM_FACE}" stroke="${INK}" stroke-width="3" opacity=".92" transform="rotate(-18 88 118)"/><ellipse cx="172" cy="118" rx="20" ry="32" fill="${CREAM_FACE}" stroke="${INK}" stroke-width="3" opacity=".92" transform="rotate(18 172 118)"/>`;
+      break;
+    case 'dragonhero':
+      slots.behindBody = `<polygon points="95,150 60,110 95,95 100,140" fill="${tint}" stroke="${INK}" stroke-width="4"/><polygon points="165,150 200,110 165,95 160,140" fill="${tint}" stroke="${INK}" stroke-width="4"/>`;
+      break;
+    case 'unicorn':
+      slots.onHead = `<polygon points="130,14 122,42 138,42" fill="#FFE9A8" stroke="${INK}" stroke-width="3.5"/>`;
+      break;
+    case 'robot':
+      slots.onHead = `<line x1="130" y1="30" x2="130" y2="14" stroke="${INK}" stroke-width="4"/><circle cx="130" cy="10" r="6" fill="${tint}" stroke="${INK}" stroke-width="3"/>`;
+      slots.onBody = `<rect x="118" y="122" width="10" height="10" fill="${INK}" opacity=".55"/><rect x="132" y="122" width="10" height="10" fill="${INK}" opacity=".55"/>`;
+      break;
+    case 'genie':
+      slots.behindBody = `<path d="M110,190 Q130,178 118,166 Q108,156 128,150" fill="none" stroke="${tint}" stroke-width="7" stroke-linecap="round" opacity=".8"/>`;
+      break;
+    case 'dino':
+      slots.onHead = `<polygon points="118,32 112,16 124,28" fill="${tint}" stroke="${INK}" stroke-width="3"/><polygon points="130,28 126,10 138,24" fill="${tint}" stroke="${INK}" stroke-width="3"/><polygon points="146,32 142,16 154,28" fill="${tint}" stroke="${INK}" stroke-width="3"/>`;
+      break;
+    case 'zombie':
+      slots.onBody = `<line x1="112" y1="130" x2="120" y2="138" stroke="${INK}" stroke-width="2.5"/><line x1="120" y1="130" x2="112" y2="138" stroke="${INK}" stroke-width="2.5"/><line x1="140" y1="150" x2="148" y2="158" stroke="${INK}" stroke-width="2.5"/><line x1="148" y1="150" x2="140" y2="158" stroke="${INK}" stroke-width="2.5"/>`;
+      break;
+    case 'wolf':
+      slots.behindHead = `<polygon points="92,58 78,28 106,52" fill="${tint}" stroke="${INK}" stroke-width="4"/><polygon points="168,58 182,28 154,52" fill="${tint}" stroke="${INK}" stroke-width="4"/>`;
+      slots.behindBody = `<polygon points="168,150 200,168 178,178" fill="${tint}" stroke="${INK}" stroke-width="3.5"/>`;
+      break;
+    case 'alien':
+      slots.onHead = `<line x1="118" y1="30" x2="112" y2="10" stroke="${INK}" stroke-width="3.5"/><circle cx="111" cy="7" r="5" fill="${tint}" stroke="${INK}" stroke-width="2.5"/><line x1="142" y1="30" x2="148" y2="10" stroke="${INK}" stroke-width="3.5"/><circle cx="149" cy="7" r="5" fill="${tint}" stroke="${INK}" stroke-width="2.5"/>`;
+      break;
+    case 'king':
+      slots.behindBody = `<path d="M100,110 Q90,160 100,196 L94,196 Q80,155 96,104 Z" fill="${tint}" stroke="${INK}" stroke-width="3.5"/><path d="M160,110 Q170,160 160,196 L166,196 Q180,155 164,104 Z" fill="${tint}" stroke="${INK}" stroke-width="3.5"/>`;
+      slots.onHead = `<polygon points="112,30 118,14 130,26 142,14 148,30" fill="none" stroke="#D9A429" stroke-width="4" stroke-linejoin="round"/>`;
+      break;
+  }
+  return slots;
+}
+
 function buildHeroSVG(){
   const tint = currentCharTint();
+  const charId = currentCharId();
+  const acc = charAccentSlots(charId, tint);
   const hat = equippedItem('sombreros');
   const veh = equippedItem('vehiculos');
   const food = equippedItem('comida');
@@ -499,24 +574,28 @@ function buildHeroSVG(){
     <ellipse cx="130" cy="204" rx="52" ry="9" fill="#000" opacity=".16"/>
     ${veh ? `<text x="210" y="186" font-size="34" text-anchor="middle" dominant-baseline="central">${escXml(veh.icon)}</text>` : ''}
     <g id="charGroup">
-      <rect x="112" y="163" width="13" height="36" rx="6.5" fill="${tint}" stroke="#1a1410" stroke-width="4"/>
-      <rect x="135" y="163" width="13" height="36" rx="6.5" fill="${tint}" stroke="#1a1410" stroke-width="4"/>
-      <ellipse cx="118" cy="200" rx="13" ry="7" fill="#1a1410"/>
-      <ellipse cx="142" cy="200" rx="13" ry="7" fill="#1a1410"/>
-      <path d="M98,128 C78,132 66,142 62,152" fill="none" stroke="#1a1410" stroke-width="15" stroke-linecap="round"/>
+      <rect x="112" y="163" width="13" height="36" rx="6.5" fill="${tint}" stroke="${INK}" stroke-width="4"/>
+      <rect x="135" y="163" width="13" height="36" rx="6.5" fill="${tint}" stroke="${INK}" stroke-width="4"/>
+      <ellipse cx="118" cy="200" rx="13" ry="7" fill="${INK}"/>
+      <ellipse cx="142" cy="200" rx="13" ry="7" fill="${INK}"/>
+      <path d="M98,128 C78,132 66,142 62,152" fill="none" stroke="${INK}" stroke-width="15" stroke-linecap="round"/>
       <path d="M98,128 C78,132 66,142 62,152" fill="none" stroke="${tint}" stroke-width="9" stroke-linecap="round"/>
-      <path d="M162,128 C182,132 194,142 198,152" fill="none" stroke="#1a1410" stroke-width="15" stroke-linecap="round"/>
+      <path d="M162,128 C182,132 194,142 198,152" fill="none" stroke="${INK}" stroke-width="15" stroke-linecap="round"/>
       <path d="M162,128 C182,132 194,142 198,152" fill="none" stroke="${tint}" stroke-width="9" stroke-linecap="round"/>
-      <circle cx="60" cy="156" r="15" fill="#FFF7E8" stroke="#1a1410" stroke-width="4"/>
-      <line x1="52" y1="162" x2="57" y2="167" stroke="#1a1410" stroke-width="2.5" stroke-linecap="round"/>
-      <line x1="60" y1="164" x2="60" y2="170" stroke="#1a1410" stroke-width="2.5" stroke-linecap="round"/>
-      <circle cx="200" cy="156" r="15" fill="#FFF7E8" stroke="#1a1410" stroke-width="4"/>
-      <line x1="205" y1="162" x2="200" y2="167" stroke="#1a1410" stroke-width="2.5" stroke-linecap="round"/>
-      <line x1="200" y1="164" x2="200" y2="170" stroke="#1a1410" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="60" cy="156" r="15" fill="${CREAM_FACE}" stroke="${INK}" stroke-width="4"/>
+      <line x1="52" y1="162" x2="57" y2="167" stroke="${INK}" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="60" y1="164" x2="60" y2="170" stroke="${INK}" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="200" cy="156" r="15" fill="${CREAM_FACE}" stroke="${INK}" stroke-width="4"/>
+      <line x1="205" y1="162" x2="200" y2="167" stroke="${INK}" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="200" y1="164" x2="200" y2="170" stroke="${INK}" stroke-width="2.5" stroke-linecap="round"/>
       ${food ? `<text x="203" y="140" font-size="26" text-anchor="middle" dominant-baseline="central">${escXml(food.icon)}</text>` : ''}
-      <ellipse cx="130" cy="140" rx="40" ry="46" fill="${tint}" stroke="#1a1410" stroke-width="5"/>
-      <path d="M118,116 L130,128 L142,116 L136,109 L124,109 Z" fill="#E63946" stroke="#1a1410" stroke-width="3"/>
-      <circle cx="130" cy="76" r="47" fill="#FFF7E8" stroke="#1a1410" stroke-width="5"/>
+      ${acc.behindBody}
+      <ellipse cx="130" cy="140" rx="40" ry="46" fill="${tint}" stroke="${INK}" stroke-width="5"/>
+      ${acc.onBody}
+      <path d="M118,116 L130,128 L142,116 L136,109 L124,109 Z" fill="#E63946" stroke="${INK}" stroke-width="3"/>
+      ${acc.behindHead}
+      <circle cx="130" cy="76" r="47" fill="${CREAM_FACE}" stroke="${INK}" stroke-width="5"/>
+      ${acc.onHead}
       <text x="130" y="80" font-size="54" text-anchor="middle" dominant-baseline="central">${escXml(state.avatar)}</text>
       ${hat ? `<text x="130" y="36" font-size="40" text-anchor="middle" dominant-baseline="central" transform="rotate(-8 130 36)">${escXml(hat.icon)}</text>` : ''}
     </g>
@@ -580,7 +659,7 @@ function initTabbar(){
       else if(tab === 'shop'){ renderShop(); showScreen('shop'); }
       else if(tab === 'online'){ renderOnline(); showScreen('online'); }
       else if(tab === 'coach'){ renderCoach(); showScreen('coach'); }
-      else if(tab === 'world'){ renderWorld(); showScreen('world'); }
+      else if(tab === 'translator'){ showScreen('translator'); }
     };
   });
 }
@@ -607,7 +686,7 @@ function renderMap(){
       <div class="mode-name">${r.name}</div>
       <div class="mode-desc">${r.desc}</div>
       <div class="realm-stars">${starsHtml(stars)}</div>`;
-    card.onclick = ()=>{ sfx.click(); quizReturnScreen = 'map'; openRealm(r.key); };
+    card.onclick = ()=>{ sfx.click(); openRealm(r.key); };
     wrap.appendChild(card);
   });
 
@@ -615,7 +694,7 @@ function renderMap(){
   bossBox.className = 'boss-node ready';
   bossBox.innerHTML = `<div style="font-size:40px;">🖋️</div><h3>El Profesor Tinta</h3><p class="footer-note" style="font-size:12.5px;">¡Enfréntate al reto final mixto!</p>
        <button class="btn btn-gold btn-block" id="boss-btn">${state.bossCleared? 'Jugar otra vez' : 'Iniciar batalla final'}</button>`;
-  $('#boss-btn').onclick = ()=>{ sfx.click(); quizReturnScreen = 'map'; startBoss(); };
+  $('#boss-btn').onclick = ()=>{ sfx.click(); startBoss(); };
 }
 
 function openRealm(key){
@@ -625,11 +704,6 @@ function openRealm(key){
 
 /* ---------------- motor de preguntas ---------------- */
 let quizCtx = null;
-let quizReturnScreen = 'map';
-function goToQuizReturnScreen(){
-  if(quizReturnScreen === 'world'){ renderWorld(); showScreen('world'); }
-  else { renderMap(); showScreen('map'); }
-}
 
 function sample(arr, n){
   const copy = arr.slice();
@@ -826,7 +900,7 @@ function finishQuiz(){
       title: stars>0 ? '¡Atracción superada!' : '¡Sigue practicando!',
       stars, correct: quizCtx.correctCount, total,
       xp: quizCtx.xpEarned, coins: quizCtx.coinsEarned,
-      onContinue: goToQuizReturnScreen,
+      onContinue: ()=>{ renderMap(); showScreen('map'); },
       onRetry: ()=>{ closeOverlay(); startQuiz(quizCtx.realmKey); },
     });
     if(stars>0){ sfx.win(); burstCenter([quizCtx.color,'#D9A429','#1F7A68']); }
@@ -841,7 +915,7 @@ function showBossResult(won, ctx){
     correct: ctx.correctCount, total: ctx.questions.length,
     xp: ctx.xpEarned, coins: ctx.coinsEarned,
     subtitle: won ? '¡Eres el campeón de la gramática del Gran Espectáculo!' : 'Repasa las atracciones e inténtalo de nuevo — ¡tú puedes!',
-    onContinue: goToQuizReturnScreen,
+    onContinue: ()=>{ renderMap(); showScreen('map'); },
     onRetry: ()=>{ closeOverlay(); startBoss(); },
   });
 }
@@ -954,7 +1028,7 @@ function finishMemory(){
       title:'¡Tren Fantasma superado!', stars, correct:memCtx.total, total:memCtx.total,
       xp, coins,
       subtitle: 'Movimientos usados: '+memCtx.moves,
-      onContinue: goToQuizReturnScreen,
+      onContinue: ()=>{ renderMap(); showScreen('map'); },
       onRetry: ()=>{ closeOverlay(); startMemory(); },
     });
   }, 400);
@@ -1081,269 +1155,68 @@ function renderCoach(){
   }
 }
 
-/* ---------------- Mundo: mapa 2D (campo / pueblo / ciudad) ---------------- */
+/* ---------------- Traductor (inglés ↔ español) ---------------- */
 
-const ZONE_OF = {present:'pueblo', past:'ciudad', passive:'ciudad', adjectives:'pueblo', regular:'ciudad', irregular:'campo'};
-const ZONE_ORDER = ['campo','pueblo','ciudad'];
-const ZONE_GROUND = {campo:'#8FBF6B', pueblo:'#D9C08A', ciudad:'#B9B9B9'};
+let translatorDir = 'en-es';
 
-let world = null;
-let worldLoopId = 0;
-let worldSetupSelection = new Set();
-
-function suggestedTopics(){
-  return REALMS.map(r=>r.key).sort((a,b)=> ensureTopicStats(b).attempts - ensureTopicStats(a).attempts);
+function initTranslatorScreen(){
+  $('#translator-swap').onclick = ()=>{
+    sfx.click();
+    translatorDir = translatorDir === 'en-es' ? 'es-en' : 'en-es';
+    updateTranslatorLabels();
+  };
+  $('#translator-btn').onclick = ()=>{ sfx.click(); runTranslate(); };
+  $('#translator-input').addEventListener('keydown', e=>{ if(e.key==='Enter'){ sfx.click(); runTranslate(); } });
+  updateTranslatorLabels();
+  renderTranslatorQuickList();
 }
 
-function initWorldScreen(){
-  $('#world-build-btn').onclick = ()=>{
-    sfx.click();
-    state.world = {topics: [...worldSetupSelection]};
-    saveState();
-    showWorldMapView();
-  };
-  $('#world-edit-btn').onclick = ()=>{
-    sfx.click();
-    if(state.world && state.world.topics) worldSetupSelection = new Set(state.world.topics);
-    showWorldSetupView();
-  };
+function updateTranslatorLabels(){
+  const fromLabel = translatorDir==='en-es' ? 'Inglés' : 'Español';
+  const toLabel = translatorDir==='en-es' ? 'Español' : 'Inglés';
+  $('#translator-direction').textContent = fromLabel+' → '+toLabel;
+  $('#translator-input').placeholder = translatorDir==='en-es' ? 'Escribe una palabra en inglés...' : 'Escribe una palabra en español...';
 }
 
-function renderWorld(){
-  if(state.world && state.world.topics && state.world.topics.length >= 5){
-    worldSetupSelection = new Set(state.world.topics);
-    showWorldMapView();
-  } else {
-    worldSetupSelection = new Set();
-    showWorldSetupView();
+async function runTranslate(){
+  const input = $('#translator-input');
+  const text = input.value.trim();
+  const resultBox = $('#translator-result');
+  if(!text){ resultBox.innerHTML = ''; return; }
+  resultBox.innerHTML = '<p class="subtitle" style="text-align:left;">Traduciendo…</p>';
+  const langpair = translatorDir === 'en-es' ? 'en|es' : 'es|en';
+  try{
+    const res = await fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(text)+'&langpair='+langpair);
+    if(!res.ok) throw new Error('bad response');
+    const data = await res.json();
+    const translated = data && data.responseData && data.responseData.translatedText;
+    if(!translated) throw new Error('no translation');
+    resultBox.innerHTML = `
+      <div class="faq-card">
+        <div style="font-size:12px; color:var(--ink-dim); font-weight:800; text-transform:uppercase;">${escXml(text)}</div>
+        <div class="faq-title" style="font-size:22px; margin-top:4px;">${escXml(translated)}</div>
+      </div>`;
+  }catch(e){
+    resultBox.innerHTML = '<p class="subtitle" style="text-align:left;">No se pudo traducir ahora mismo. Revisa tu conexión a internet e intenta de nuevo.</p>';
   }
 }
 
-function showWorldSetupView(){
-  $('#world-setup').hidden = false;
-  $('#world-map-wrap').hidden = true;
-  renderWorldSetup();
-}
-function showWorldMapView(){
-  $('#world-setup').hidden = true;
-  $('#world-map-wrap').hidden = false;
-  buildWorldMap([...worldSetupSelection]);
-}
-
-function renderWorldSetup(){
-  const wrap = $('#world-topic-picker');
+function renderTranslatorQuickList(){
+  const wrap = $('#translator-quick');
   wrap.innerHTML = '';
-  if(worldSetupSelection.size === 0){
-    const ranked = suggestedTopics();
-    const hasData = REALMS.some(r=> ensureTopicStats(r.key).attempts > 0);
-    const preset = hasData ? ranked.slice(0,5) : REALMS.map(r=>r.key);
-    preset.forEach(k=>worldSetupSelection.add(k));
-  }
-  REALMS.forEach(r=>{
-    const on = worldSetupSelection.has(r.key);
+  sample(IRREGULAR_PAIRS, 10).forEach(([base])=>{
     const chip = document.createElement('button');
-    chip.className = 'topic-chip'+(on?' active':'');
-    chip.innerHTML = `${r.icon} ${r.name}`;
+    chip.className = 'topic-chip';
+    chip.textContent = base;
     chip.onclick = ()=>{
       sfx.click();
-      if(on) worldSetupSelection.delete(r.key); else worldSetupSelection.add(r.key);
-      renderWorldSetup();
+      translatorDir = 'en-es';
+      updateTranslatorLabels();
+      $('#translator-input').value = base;
+      runTranslate();
     };
     wrap.appendChild(chip);
   });
-  $('#world-count-label').textContent = worldSetupSelection.size+' / 6 temas elegidos (mínimo 5) — sugeridos según lo que más practicas en el Coach';
-  $('#world-build-btn').disabled = worldSetupSelection.size < 5;
-}
-
-function drawTree(ctx,x,y){
-  ctx.fillStyle = '#6B4226'; ctx.fillRect(x-6,y+20,12,30);
-  ctx.beginPath(); ctx.arc(x,y,26,0,Math.PI*2); ctx.fillStyle='#3E7D4F'; ctx.fill();
-  ctx.lineWidth=3; ctx.strokeStyle='#241A10'; ctx.stroke();
-}
-function drawHouse(ctx,x,y){
-  ctx.fillStyle='#E8B96B'; ctx.fillRect(x-30,y+30,60,50);
-  ctx.strokeStyle='#241A10'; ctx.lineWidth=3; ctx.strokeRect(x-30,y+30,60,50);
-  ctx.beginPath(); ctx.moveTo(x-38,y+30); ctx.lineTo(x,y-10); ctx.lineTo(x+38,y+30); ctx.closePath();
-  ctx.fillStyle='#8E1B2B'; ctx.fill(); ctx.stroke();
-}
-function drawBuilding(ctx,x,y,w,h){
-  ctx.fillStyle='#D8D2C2'; ctx.fillRect(x,y,w,h);
-  ctx.strokeStyle='#241A10'; ctx.lineWidth=3; ctx.strokeRect(x,y,w,h);
-  ctx.fillStyle='#8A7358';
-  for(let ry=y+14; ry<y+h-10; ry+=22){
-    for(let rx=x+10; rx<x+w-10; rx+=20){ ctx.fillRect(rx,ry,10,12); }
-  }
-}
-function drawNpc(ctx,n,active){
-  ctx.save();
-  ctx.beginPath(); ctx.ellipse(n.x, n.y+34, 20,7,0,0,Math.PI*2); ctx.fillStyle='rgba(0,0,0,.18)'; ctx.fill();
-  ctx.beginPath(); ctx.arc(n.x, n.y, 26, 0, Math.PI*2);
-  ctx.fillStyle = n.color; ctx.fill();
-  ctx.lineWidth = active?5:3.5; ctx.strokeStyle = '#241A10'; ctx.stroke();
-  ctx.font='26px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillText(n.icon, n.x, n.y+1);
-  ctx.font='bold 11px Nunito, sans-serif'; ctx.fillStyle='#241A10';
-  ctx.fillText(n.name.split(' ').slice(0,3).join(' '), n.x, n.y+48);
-  ctx.restore();
-}
-function drawPlayer(ctx,p){
-  ctx.save();
-  ctx.beginPath(); ctx.ellipse(p.x,p.y+18,16,6,0,0,Math.PI*2); ctx.fillStyle='rgba(0,0,0,.2)'; ctx.fill();
-  ctx.beginPath(); ctx.arc(p.x,p.y,20,0,Math.PI*2);
-  ctx.fillStyle = currentCharTint(); ctx.fill();
-  ctx.lineWidth=4; ctx.strokeStyle='#241A10'; ctx.stroke();
-  ctx.font='22px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillText(state.avatar, p.x, p.y);
-  ctx.restore();
-}
-
-function buildWorldMap(topics){
-  const canvas = $('#world-canvas');
-  const ctx = canvas.getContext('2d');
-
-  const zones = {campo:[], pueblo:[], ciudad:[]};
-  topics.forEach(k=> zones[ZONE_OF[k]].push(k));
-
-  const SLOT_W = 220, PAD = 160;
-  let x = 0;
-  const zoneLayout = [];
-  ZONE_ORDER.forEach(zone=>{
-    const count = zones[zone].length;
-    const width = Math.max(260, count*SLOT_W) + PAD;
-    zoneLayout.push({zone, x0:x, width, topics:zones[zone]});
-    x += width;
-  });
-  const bossX = x + 90;
-  const totalWidth = Math.round(bossX + 220);
-
-  canvas.width = totalWidth;
-  canvas.height = 380;
-  canvas.style.width = totalWidth+'px';
-  canvas.style.height = '380px';
-
-  const npcs = [];
-  zoneLayout.forEach(zl=>{
-    const n = zl.topics.length;
-    zl.topics.forEach((key,i)=>{
-      const realm = REALMS.find(r=>r.key===key);
-      const slotW = zl.width/(n+1);
-      npcs.push({
-        key, name:realm.name, icon:realm.icon, color:realm.color,
-        x: zl.x0 + slotW*(i+1), y: 246 + (i%2===0? -8:12),
-      });
-    });
-  });
-  npcs.push({key:'boss', name:'El Profesor Tinta', icon:'🖋️', color:'#8E1B2B', x:bossX, y:244, isBoss:true});
-
-  worldLoopId += 1;
-  const myLoopId = worldLoopId;
-  world = {
-    canvas, ctx, npcs, zoneLayout, totalWidth,
-    player:{x:40, y:280, tx:40, ty:280},
-    nearNpc:null,
-  };
-
-  const canvasClone = canvas.cloneNode(true);
-  canvas.parentNode.replaceChild(canvasClone, canvas);
-  world.canvas = canvasClone;
-  world.ctx = canvasClone.getContext('2d');
-  wireWorldInput(myLoopId);
-
-  requestAnimationFrame(function tick(){ worldLoop(myLoopId, tick); });
-}
-
-function wireWorldInput(myLoopId){
-  const canvas = world.canvas;
-  canvas.addEventListener('click', e=>{
-    if(myLoopId !== worldLoopId || !world) return;
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width/rect.width, scaleY = canvas.height/rect.height;
-    const cx = (e.clientX-rect.left)*scaleX, cy = (e.clientY-rect.top)*scaleY;
-    const hit = world.npcs.find(n=> Math.hypot(n.x-cx, n.y-cy) < 34);
-    if(hit){ openWorldDialogue(hit); return; }
-    world.player.tx = Math.max(20, Math.min(world.totalWidth-20, cx));
-    world.player.ty = Math.max(226, Math.min(340, cy));
-  });
-}
-
-function worldLoop(id, tick){
-  if(id !== worldLoopId) return;
-  requestAnimationFrame(tick);
-  if(!world || screens.world.hidden || $('#world-map-wrap').hidden) return;
-  updateWorld();
-  drawWorld();
-}
-
-function updateWorld(){
-  const p = world.player;
-  const dx = p.tx-p.x, dy = p.ty-p.y;
-  const dist = Math.hypot(dx,dy);
-  const speed = 3.4;
-  if(dist > speed){ p.x += dx/dist*speed; p.y += dy/dist*speed; }
-  else { p.x = p.tx; p.y = p.ty; }
-
-  world.nearNpc = world.npcs.find(n=> Math.hypot(n.x-p.x, n.y-p.y) < 46) || null;
-
-  const sc = $('#world-scroll');
-  const targetScroll = p.x - sc.clientWidth/2;
-  sc.scrollLeft = Math.max(0, Math.min(world.totalWidth-sc.clientWidth, targetScroll));
-}
-
-function drawWorld(){
-  const {ctx, canvas} = world;
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  world.zoneLayout.forEach(zl=>{
-    ctx.fillStyle = ZONE_GROUND[zl.zone];
-    ctx.fillRect(zl.x0, 0, zl.width, canvas.height);
-    if(zl.zone === 'campo'){
-      for(let i=30; i<zl.width; i+=95) drawTree(ctx, zl.x0+i, 185);
-    } else if(zl.zone === 'pueblo'){
-      for(let i=40; i<zl.width; i+=150) drawHouse(ctx, zl.x0+i, 140);
-    } else {
-      for(let i=20; i<zl.width; i+=110) drawBuilding(ctx, zl.x0+i, 55, 72, 175);
-    }
-  });
-  ctx.fillStyle = '#3A2A22';
-  ctx.fillRect(world.totalWidth-220, 0, 220, canvas.height);
-
-  ctx.fillStyle = 'rgba(90,65,40,.55)';
-  ctx.fillRect(0, 300, world.totalWidth, 46);
-
-  world.npcs.forEach(n=> drawNpc(ctx, n, n===world.nearNpc));
-  drawPlayer(ctx, world.player);
-
-  if(world.nearNpc){
-    ctx.save();
-    ctx.font='bold 15px Nunito, sans-serif'; ctx.textAlign='center';
-    ctx.fillStyle='#241A10';
-    ctx.fillText('👆 Toca para hablar', world.player.x, world.player.y-42);
-    ctx.restore();
-  }
-}
-
-function openWorldDialogue(npc){
-  sfx.click();
-  const realm = REALMS.find(r=>r.key===npc.key);
-  const overlay2 = document.createElement('div');
-  overlay2.className = 'overlay';
-  overlay2.innerHTML = `
-    <div class="card result-card">
-      <div class="hero-badge" style="font-size:40px;">${npc.icon}</div>
-      <h2 class="title-xl" style="font-size:20px;">${npc.name}</h2>
-      <p class="subtitle">${npc.isBoss? '¡Enfréntate al reto final mixto!' : (realm? realm.desc : '')}</p>
-      <div style="display:flex; gap:10px; margin-top:14px;">
-        <button class="btn btn-ghost btn-block" id="world-dlg-close">Seguir explorando</button>
-        <button class="btn btn-primary btn-block" id="world-dlg-start">Comenzar reto</button>
-      </div>
-    </div>`;
-  document.body.appendChild(overlay2);
-  $('#world-dlg-close').onclick = ()=> overlay2.remove();
-  $('#world-dlg-start').onclick = ()=>{
-    overlay2.remove();
-    quizReturnScreen = 'world';
-    if(npc.isBoss) startBoss(); else openRealm(npc.key);
-  };
 }
 
 /* ---------------- Online: código de equipo (PeerJS, sin backend propio) ---------------- */
@@ -1659,7 +1532,7 @@ function bootUI(){
   initWelcome();
   initTabbar();
   initOnlineScreen();
-  initWorldScreen();
+  initTranslatorScreen();
   initHeroStage();
   renderHud();
   if(state.started){ renderMap(); showScreen('map'); }
